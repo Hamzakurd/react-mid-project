@@ -2,8 +2,7 @@ import { Box, useMediaQuery } from "@mui/material";
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 
-import Sidebar from "./Sidebar";
-
+import Sidebar from "./SideBar";
 export default function AdminLayout() {
   const isMobile = useMediaQuery("(max-width:600px)");
 
