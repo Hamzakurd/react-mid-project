@@ -9,18 +9,18 @@ const defaultProducts = [
   {
     id: "ev-1",
     name: "EV Charging Cable Holder",
-    description: "Wall-mounted holder for EV charging cables."
+    description: "Wall-mounted holder for EV charging cables.",
   },
   {
     id: "ev-2",
     name: "Nissan Leaf Electric Drive Motor",
-    description: "Electric drive motor for Nissan Leaf vehicles."
+    description: "Electric drive motor for Nissan Leaf vehicles.",
   },
   {
     id: "ev-3",
     name: "Tire Pressure Sensor (TPMS)",
-    description: "Sensor for monitoring vehicle tire pressure."
-  }
+    description: "Sensor for monitoring vehicle tire pressure.",
+  },
 ];
 
 // READ PRODUCTS
@@ -30,7 +30,10 @@ const readProducts = () => {
 
     if (saved !== null) {
       const parsed = JSON.parse(saved);
-      return Array.isArray(parsed) ? parsed : [];
+
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
     }
 
     localStorage.setItem(
@@ -41,7 +44,7 @@ const readProducts = () => {
     return defaultProducts;
   } catch (error) {
     console.error("Error reading products:", error);
-    return [];
+    return defaultProducts;
   }
 };
 
@@ -68,14 +71,18 @@ export const useProducts = () => {
   // GET ALL PRODUCTS
   const getAllProducts = () => {
     const savedProducts = readProducts();
+
     setProducts(savedProducts);
+
     return savedProducts;
   };
 
   // GET PRODUCT BY ID
   const getProductById = (id) => {
+    const savedProducts = readProducts();
+
     return (
-      readProducts().find(
+      savedProducts.find(
         (product) => String(product.id) === String(id)
       ) || null
     );
@@ -95,12 +102,14 @@ export const useProducts = () => {
       ...data,
       id: crypto.randomUUID(),
       name,
-      description
+      description,
     };
 
+    const currentProducts = readProducts();
+
     const updatedProducts = [
-      ...readProducts(),
-      newProduct
+      ...currentProducts,
+      newProduct,
     ];
 
     if (saveProducts(updatedProducts)) {
@@ -140,7 +149,7 @@ export const useProducts = () => {
               ...data,
               id: product.id,
               name,
-              description
+              description,
             }
           : product
     );
@@ -184,6 +193,6 @@ export const useProducts = () => {
     getProductById,
     addProduct,
     updateProduct,
-    deleteProduct
+    deleteProduct,
   };
 };
