@@ -13,13 +13,14 @@ export function CarsProvider({ children }) {
       if (saved !== null) {
         const parsed = JSON.parse(saved);
 
-        if (Array.isArray(parsed)) {
+        if (Array.isArray(parsed) && parsed.length > 0) {
           return parsed;
         }
       }
 
       return initialCars;
-    } catch {
+    } catch (error) {
+      console.error("Failed to load cars:", error);
       return initialCars;
     }
   });
