@@ -1,0 +1,336 @@
+[
+  {
+    "name": "Bosch AGM 12V Auxiliary Battery",
+    "description": "A reliable 12V AGM auxiliary battery designed to power essential vehicle electronics and support electrical systems in compatible vehicles.",
+    "category": "Batteries",
+    "price": 120,
+    "stock": 10,
+    "image": "/product/bosch-agm.jpg",
+    "compatibleModels": [
+      "EV models using a matching 12V AGM battery specification; verify dimensions",
+      "capacity and terminals."
+    ],
+    "id": "b7d0e1bc-2262-4edf-8455-74ad8e61ae75"
+  },
+  {
+    "name": "Nissan Leaf Traction Battery Pack",
+    "description": "A high-voltage lithium-ion traction battery pack designed to store energy and power the electric drivetrain of a compatible Nissan Leaf.",
+    "category": "Batteries",
+    "price": 3200,
+    "stock": 3,
+    "image": "/product/nissan-leaf-battery.jpg",
+    "compatibleModels": [
+      "Nissan Leaf  only the matching generation",
+      "capacity and OEM battery part number."
+    ],
+    "id": "2526e725-04fd-4041-9800-49414ae403cd"
+  },
+  {
+    "name": "EV Lithium Battery Module",
+    "description": "A lithium-ion battery module intended for specialized electric vehicle traction battery repairs and energy storage applications.",
+    "category": "Batteries",
+    "price": 650,
+    "stock": 4,
+    "image": "/product/PriusBatteryModule.jpg",
+    "compatibleModels": [
+      "Model-specific EV battery packs; verify module chemistry",
+      "voltage",
+      "BMS and OEM part number."
+    ],
+    "id": "334bcbf5-fd0d-45ea-aa68-102ff735271d"
+  },
+  {
+    "name": "Battery Management System (BMS)",
+    "description": "An electronic battery management unit designed to monitor battery voltage, temperature and cell performance to support safe operation.",
+    "category": "Batteries",
+    "price": 180,
+    "stock": 6,
+    "image": "/product/Battery Management System (BMS).jpg",
+    "compatibleModels": [
+      "Only EV battery packs supporting the exact BMS hardware and software version."
+    ],
+    "id": "7c2f80c8-e474-48fa-8c1d-567ebfe85132"
+  },
+  {
+    "name": "NOCO GB40 12V Jump Starter",
+    "description": "A portable 1000A jump starter designed to help start vehicles equipped with compatible 12V lead-acid batteries. Not intended for high-voltage EV traction batteries.",
+    "category": "Batteries",
+    "price": 85,
+    "stock": 10,
+    "image": "/product/gb70.avif",
+    "compatibleModels": [
+      "Vehicles with supported 12V lead-acid batteries; check the battery manufacturer's instructions."
+    ],
+    "id": "0b4c952f-ae9d-4180-b424-ce1f72e725d1"
+  },
+  {
+    "name": "Wallbox Pulsar Plus Home Charger",
+    "description": "A compact smart home EV charging station with connected charging features, designed for convenient everyday AC charging.",
+    "category": "Chargers",
+    "price": 350,
+    "stock": 8,
+    "image": "/product/wallbox_chargers_pulsar_plus_48a_j1772_2.webp",
+    "compatibleModels": [
+      "Electric vehicles with a charging port matching the selected Wallbox connector version."
+    ],
+    "id": "4f2d9316-08dc-43c6-b843-0069e52b022a"
+  },
+  {
+    "name": "Portable AC EV Charger",
+    "description": "A portable electric vehicle charging unit designed for flexible AC charging using a suitable electrical supply and compatible vehicle connector.",
+    "category": "Chargers",
+    "price": 160,
+    "stock": 10,
+    "image": "/product/Portable AC EV Charger.png",
+    "compatibleModels": [
+      "EVs with the matching Type 1 or Type 2 AC charging port",
+      "depending on charger version."
+    ],
+    "id": "c9f6703f-3681-45b2-8f22-3c22fb8130d9"
+  },
+  {
+    "name": "Type 2 Charging Cable",
+    "description": "A durable AC charging cable designed to connect compatible electric vehicles to Type 2 charging stations.",
+    "category": "Chargers",
+    "price": 90,
+    "stock": 20,
+    "image": "/product/Type 2 Charging Cable.jpg",
+    "compatibleModels": [
+      "Tesla Model 3",
+      "Tesla Model Y",
+      "Hyundai IONIQ 5",
+      "Hyundai IONIQ 6",
+      "BMW i4 and VW ID.4 — Type 2 versions only."
+    ],
+    "id": "2d3b1372-8b09-4eb8-a980-c5881d94d4a1"
+  },
+  {
+    "name": "Tesla Wall Connector",
+    "description": "A wall-mounted smart AC charger designed for convenient home charging of electric vehicles equipped with compatible charging ports.",
+    "category": "Chargers",
+    "price": 380,
+    "stock": 5,
+    "image": "/product/Tesla Wall Connector.webp",
+    "compatibleModels": [
+      "Tesla Model 3",
+      "Model Y",
+      "Model S",
+      "Model X and other EVs equipped with Type 2 ports — for the Type 2 Wall Connector version."
+    ],
+    "id": "df94e5d4-8649-4fae-bc30-31a637273d1f"
+  },
+  {
+    "name": "EV Charging Cable Holder",
+    "description": "A practical wall-mounted cable holder designed to keep electric vehicle charging cables organized, protected and easy to access.",
+    "category": "Chargers",
+    "price": 18,
+    "stock": 30,
+    "image": "/product/EV Charging Cable Holder.jpg",
+    "compatibleModels": [
+      "Universal accessory for suitable charging cables and wall-mounted EV charging setups."
+    ],
+    "id": "c4be8b8f-8a90-4d42-afc6-36bfd3d18df5"
+  },
+  {
+    "name": "Nissan Leaf Electric Drive Motor",
+    "description": "An electric traction motor assembly designed to provide smooth and efficient propulsion for a compatible Nissan Leaf electric drivetrain.",
+    "category": "Motors",
+    "price": 1100,
+    "stock": 3,
+    "image": "/product/Nissan Leaf Electric Drive Motor.jpg",
+    "compatibleModels": [
+      "Nissan Leaf — verify model year",
+      "motor code and original OEM part number."
+    ],
+    "id": "0911bc34-495f-4bf4-bdce-acc9377d4818"
+  },
+  {
+    "name": "EV AC Traction Motor",
+    "description": "A three-phase AC traction motor designed for electric vehicle propulsion systems and efficient power delivery.",
+    "category": "Motors",
+    "price": 950,
+    "stock": 4,
+    "image": "/product/EV AC Traction Motor.jpg",
+    "compatibleModels": [
+      "Model-specific electric drivetrains; match voltage",
+      "rated power",
+      "mounting points and inverter."
+    ],
+    "id": "62dc2ecd-32c2-472c-9f9a-7157579e7fb9"
+  },
+  {
+    "name": "Permanent Magnet EV Motor",
+    "description": "A high-efficiency permanent magnet synchronous motor designed to deliver responsive torque and efficient performance in electric drive applications.",
+    "category": "Motors",
+    "price": 1250,
+    "stock": 3,
+    "image": "/product/Permanent Magnet EV Motor.jpg",
+    "compatibleModels": [
+      "EV platforms designed for the exact permanent magnet motor and inverter configuration."
+    ],
+    "id": "84a8af89-1514-4e66-9e75-1d6be4ea6ea2"
+  },
+  {
+    "name": "EV Motor Inverter",
+    "description": "A power electronics unit designed to convert high-voltage DC battery power into controlled AC power for an electric traction motor.",
+    "category": "Motors",
+    "price": 720,
+    "stock": 5,
+    "image": "/product/EV Motor Inverter.jpg",
+    "compatibleModels": [
+      "Model-specific EV motor systems; match inverter hardware",
+      "voltage and control software."
+    ],
+    "id": "d6e64e5f-6f1f-4af0-b740-0b4a8623a4be"
+  },
+  {
+    "name": "EV Motor Reduction Gear Assembly",
+    "description": "A reduction gear assembly designed to transfer torque from an electric motor to the drive wheels while providing an appropriate gear ratio.",
+    "category": "Motors",
+    "price": 450,
+    "stock": 6,
+    "image": "/product/EV Motor Reduction Gear Assembly.jpg",
+    "compatibleModels": [
+      "Only matching EV drive-unit and transmission assemblies; verify OEM part number."
+    ],
+    "id": "9425ac4d-00d4-43c6-906c-8b597aa6852b"
+  },
+  {
+    "name": "Bosch HEPA Cabin Air Filter",
+    "description": "A high-efficiency cabin air filter designed to help reduce airborne dust, allergens and other particles entering the vehicle interior.",
+    "category": "Spare Parts",
+    "price": 25,
+    "stock": 25,
+    "image": "/product/Bosch HEPA Cabin Air Filter.jpg",
+    "compatibleModels": [
+      "Vehicle models listed for the exact Bosch filter part number; fitment is not universal."
+    ],
+    "id": "69ae79fb-bb4d-4646-b012-e8e48a9fdd62"
+  },
+  {
+    "name": "EV Brake Pads Set",
+    "description": "A set of replacement brake pads designed to provide consistent friction performance and reliable braking for compatible vehicles.",
+    "category": "Spare Parts",
+    "price": 45,
+    "stock": 20,
+    "image": "/product/EV Brake Pads Set.jpg",
+    "compatibleModels": [
+      "Tesla Model 3",
+      "Hyundai IONIQ 5",
+      "VW ID.4 or Nissan Leaf only when the selected brake pad part number matches."
+    ],
+    "id": "4ee900b1-f6cc-475f-beef-926a56d68a80"
+  },
+  {
+    "name": "EV Electric Coolant Pump",
+    "description": "An electrically operated coolant pump designed to circulate coolant through compatible electric vehicle thermal management systems.",
+    "category": "Spare Parts",
+    "price": 95,
+    "stock": 9,
+    "image": "/product/EV Electric Coolant Pump.jpg",
+    "compatibleModels": [
+      "Model-specific EV cooling systems; verify exact pump part number",
+      "connectors and flow specification."
+    ],
+    "id": "cb7d9a8d-6867-4a85-b794-32997e003717"
+  },
+  {
+    "name": "Premium Windshield Wiper Blades",
+    "description": "Durable windshield wiper blades designed to provide smooth operation and clear visibility during rain and challenging weather conditions.",
+    "category": "Spare Parts",
+    "price": 18,
+    "stock": 30,
+    "image": "/product/Premium Windshield Wiper Blades.jpg",
+    "compatibleModels": [
+      "Tesla Model 3",
+      "Hyundai IONIQ 5",
+      "VW ID.4",
+      "BMW i4 and Nissan Leaf with the correct blade lengths and adapters."
+    ],
+    "id": "ae8a6549-a904-422d-92e1-d4d6374ec0f3"
+  },
+  {
+    "name": "Tire Pressure Sensor (TPMS)",
+    "description": "A tire pressure monitoring sensor designed to measure tire pressure and transmit information to a compatible vehicle monitoring system.",
+    "category": "Spare Parts",
+    "price": 20,
+    "stock": 25,
+    "image": "/product/Tire Pressure Sensor (TPMS).jpg",
+    "compatibleModels": [
+      "Tesla",
+      "Hyundai",
+      "VW",
+      "BMW and Nissan models only when sensor frequency and protocol match."
+    ],
+    "id": "cc821674-ec0f-4d38-866a-43f27bf9b1ba"
+  },
+  {
+    "name": "Michelin Digital Tire Inflator",
+    "description": "A portable digital tire inflator designed for convenient tire pressure maintenance, with easy-to-read pressure information and adjustable inflation settings.",
+    "category": "Accessories",
+    "price": 35,
+    "stock": 20,
+    "image": "/product/Michelin Digital Tire Inflator.jpg",
+    "compatibleModels": [
+      "Tesla Model 3",
+      "Tesla Model Y",
+      "VW ID.4",
+      "Hyundai IONIQ 5",
+      "Hyundai IONIQ 6",
+      "BMW i4 and Nissan Leaf when a compatible power source is available."
+    ],
+    "id": "4bcf487a-5950-4478-9019-3c13042a7104"
+  },
+  {
+    "name": "Portable Car Vacuum Cleaner",
+    "description": "A compact portable vacuum cleaner designed to remove dust, dirt and debris from vehicle seats, carpets and interior surfaces.",
+    "category": "Accessories",
+    "price": 18,
+    "stock": 29,
+    "image": "/product/Portable Car Vacuum Cleaner.jpg",
+    "compatibleModels": [
+      "Universal — suitable for most vehicle interiors."
+    ],
+    "id": "df0dcd1e-6245-4cce-b8af-dfcf933eb38b"
+  },
+  {
+    "name": "Magnetic Phone Holder",
+    "description": "A compact magnetic phone holder designed to keep a compatible smartphone securely positioned for convenient navigation and hands-free viewing.",
+    "category": "Accessories",
+    "price": 4,
+    "stock": 45,
+    "image": "/product/Magnetic Phone Holder.jpg",
+    "compatibleModels": [
+      "Universal — Tesla",
+      "Hyundai",
+      "Volkswagen",
+      "BMW",
+      "Nissan and most other vehicles with suitable mounting surfaces."
+    ],
+    "id": "bce47655-5109-4785-8356-1162b8fefee8"
+  },
+  {
+    "name": "Foldable Trunk Organizer",
+    "description": "A foldable storage organizer designed to keep groceries, tools, charging accessories and personal belongings neatly arranged in a vehicle trunk.",
+    "category": "Accessories",
+    "price": 18,
+    "stock": 25,
+    "image": "/product/Foldable Trunk Organizer.jpg",
+    "compatibleModels": [
+      "Universal — compatible with most vehicles having sufficient trunk space."
+    ],
+    "id": "f9ab046a-b9cf-4586-872b-09eb5cd75062"
+  },
+  {
+    "name": "Car Emergency Safety Kit",
+    "description": "A portable vehicle emergency kit containing essential safety accessories to support roadside preparedness and emergency situations.",
+    "category": "Accessories",
+    "price": 22,
+    "stock": 15,
+    "image": "/product/Car Emergency Safety Kit.jpg",
+    "compatibleModels": [
+      "Universal — suitable for most electric and conventional vehicles."
+    ],
+    "id": "e32640b6-7d64-4ae2-841b-d5a7eadc6710"
+  }
+]
