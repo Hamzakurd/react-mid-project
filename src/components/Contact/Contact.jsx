@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import {
   Box,
@@ -9,7 +8,6 @@ import {
   Rating,
   TextField,
   Typography,
-  Grid,
   Card,
   CardContent,
   Avatar,
@@ -152,8 +150,8 @@ export default function Contact() {
           </Typography>
         </Box>
 
-        <Grid container spacing={4} alignItems="stretch">
-          <Grid size={{ xs: 12, md: 7 }}>
+        <Box sx={{ display: "grid", gridTemplateColumns: { xs: "minmax(0, 1fr)", md: "minmax(0, 7fr) minmax(0, 5fr)" }, gap: 4, alignItems: "stretch", width: "100%" }}>
+          <Box sx={{ minWidth: 0 }}>
             <Paper
               elevation={0}
               sx={{
@@ -167,9 +165,8 @@ export default function Contact() {
             >
               <Stack
                 direction="row"
-                alignItems="center"
                 spacing={1.5}
-                sx={{ mb: 2 }}
+                sx={{ mb: 2, alignItems: "center" }}
               >
                 <RateReviewIcon
                   sx={{
@@ -312,9 +309,9 @@ export default function Contact() {
                 </Stack>
               </Box>
             </Paper>
-          </Grid>
+          </Box>
 
-          <Grid size={{ xs: 12, md: 5 }}>
+          <Box sx={{ minWidth: 0 }}>
             <Paper
               elevation={0}
               sx={{
@@ -409,8 +406,8 @@ export default function Contact() {
                 ))}
               </Stack>
             </Paper>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
 
         <Box sx={{ mt: 8 }}>
           <Box sx={{ textAlign: "center", mb: 4 }}>
@@ -464,12 +461,9 @@ export default function Contact() {
               </Typography>
             </Paper>
           ) : (
-            <Grid container spacing={3}>
+            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "minmax(0, 1fr)", sm: "repeat(2, minmax(0, 1fr))", md: "repeat(3, minmax(0, 1fr))" }, gap: 3, width: "100%" }}>
               {reviews.map((msg) => (
-                <Grid
-                  key={msg.id}
-                  size={{ xs: 12, sm: 6, md: 4 }}
-                >
+                <Box key={msg.id} sx={{ minWidth: 0 }}>
                   <Card
                     elevation={0}
                     sx={{
@@ -548,9 +542,9 @@ export default function Contact() {
                       </Typography>
                     </CardContent>
                   </Card>
-                </Grid>
+                </Box>
               ))}
-            </Grid>
+            </Box>
           )}
         </Box>
       </Container>

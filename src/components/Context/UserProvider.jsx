@@ -1,118 +1,189 @@
-import { useAuth } from "../Hooks/UseAuth";
+
+import { useState } from "react";
 import toast from "react-hot-toast";
-import { UsersContext } from "./UsersContext";
 
-export const UsersProvider = ({ children }) => {
+const STORAGE_KEY = "evWiseProducts";
 
-  const {
-    users,
-    setUsers,
-    currentUser,
-    setCurrentUser
-  } = useAuth();
+// DEFAULT PRODUCTS
+const defaultProducts = [
+  {
+    id: "ev-1",
+    name: "EV Charging Cable Holder",
+    description: "Wall-mounted holder for EV charging cables."
+  },
+  {
+    id: "ev-2",
+    name: "Nissan Leaf Electric Drive Motor",
+    description: "Electric drive motor for Nissan Leaf vehicles."
+  },
+  {
+    id: "ev-3",
+    name: "Tire Pressure Sensor (TPMS)",
+    description: "Sensor for monitoring vehicle tire pressure."
+  }
+];
 
-  // DELETE USER
+// READ PRODUCTS
+const readProducts = () => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
 
-  const deleteUser = async (id) => {
+    if (saved !== null) {
+      const parsed = JSON.parse(saved);
+      return Array.isArray(parsed) ? parsed : [];
+    }
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(defaultProducts)
+    );
+
+    return defaultProducts;
+  } catch (error) {
+    console.error("Error reading products:", error);
+    return [];
+  }
+};
+
+export const useProducts = () => {
+  const [products, setProducts] = useState(readProducts);
+
+  // SAVE PRODUCTS
+  const saveProducts = (updatedProducts) => {
     try {
-
-      const updatedUsers = users.filter(
-        (user) => user.id !== id
-      );
-
-      if (updatedUsers.length === users.length) {
-        toast.error("User not found!");
-        return false;
-      }
-
       localStorage.setItem(
-        "users",
-        JSON.stringify(updatedUsers)
+        STORAGE_KEY,
+        JSON.stringify(updatedProducts)
       );
 
-      setUsers(updatedUsers);
-
-      if (currentUser?.id === id) {
-        localStorage.removeItem("currentUser");
-        setCurrentUser(null);
-      }
-
-      toast.success("User deleted successfully!");
-
+      setProducts(updatedProducts);
       return true;
-
     } catch (error) {
-      console.error(error);
-      toast.error("Failed to delete user!");
+      console.error("Error saving products:", error);
+      toast.error("Failed to save products!");
       return false;
     }
   };
 
-  // UPDATE USER ROLE
-
-  const updateUser = async (id, newRole) => {
-    try {
-
-      const user = users.find(
-        (user) => user.id === id
-      );
-
-      if (!user) {
-        toast.error("User not found!");
-        return false;
-      }
-
-      if (!["user", "admin"].includes(newRole)) {
-        toast.error("Please select a valid role!");
-        return false;
-      }
-
-      const updatedUsers = users.map((user) =>
-        user.id === id
-          ? { ...user, role: newRole }
-          : user
-      );
-
-      localStorage.setItem(
-        "users",
-        JSON.stringify(updatedUsers)
-      );
-
-      setUsers(updatedUsers);
-
-      if (currentUser?.id === id) {
-        const updatedCurrentUser = {
-          ...currentUser,
-          role: newRole
-        };
-
-        setCurrentUser(updatedCurrentUser);
-
-        localStorage.setItem(
-          "currentUser",
-          JSON.stringify(updatedCurrentUser)
-        );
-      }
-
-      toast.success("User role updated!");
-
-      return true;
-
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to update user!");
-      return false;
-    }
+  // GET ALL PRODUCTS
+  const getAllProducts = () => {
+    const savedProducts = readProducts();
+    setProducts(savedProducts);
+    return savedProducts;
   };
 
-  return (
-    <UsersContext.Provider
-      value={{
-        deleteUser,
-        updateUser
-      }}
-    >
-      {children}
-    </UsersContext.Provider>
-  );
+  // GET PRODUCT BY ID
+  const getProductById = (id) => {
+    return (
+      readProducts().find(
+        (product) => String(product.id) === String(id)
+      ) || null
+    );
+  };
+
+  // ADD PRODUCT
+  const addProduct = (data) => {
+    const name = data?.name?.trim();
+    const description = data?.description?.trim();
+
+    if (!name || !description) {
+      toast.error("Please fill all fields!");
+      return false;
+    }
+
+    const newProduct = {
+      ...data,
+      id: crypto.randomUUID(),
+      name,
+      description
+    };
+
+    const updatedProducts = [
+      ...readProducts(),
+      newProduct
+    ];
+
+    if (saveProducts(updatedProducts)) {
+      toast.success("Product added successfully!");
+      return true;
+    }
+
+    return false;
+  };
+
+  // UPDATE PRODUCT
+  const updateProduct = (id, data) => {
+    const name = data?.name?.trim();
+    const description = data?.description?.trim();
+
+    if (!name || !description) {
+      toast.error("Please fill all fields!");
+      return false;
+    }
+
+    const currentProducts = readProducts();
+
+    const productExists = currentProducts.some(
+      (product) => String(product.id) === String(id)
+    );
+
+    if (!productExists) {
+      toast.error("Product not found!");
+      return false;
+    }
+
+    const updatedProducts = currentProducts.map(
+      (product) =>
+        String(product.id) === String(id)
+          ? {
+              ...product,
+              ...data,
+              id: product.id,
+              name,
+              description
+            }
+          : product
+    );
+
+    if (saveProducts(updatedProducts)) {
+      toast.success("Product updated successfully!");
+      return true;
+    }
+
+    return false;
+  };
+
+  // DELETE PRODUCT
+  const deleteProduct = (id) => {
+    const currentProducts = readProducts();
+
+    const productExists = currentProducts.some(
+      (product) => String(product.id) === String(id)
+    );
+
+    if (!productExists) {
+      toast.error("Product not found!");
+      return false;
+    }
+
+    const updatedProducts = currentProducts.filter(
+      (product) => String(product.id) !== String(id)
+    );
+
+    if (saveProducts(updatedProducts)) {
+      toast.success("Product deleted successfully!");
+      return true;
+    }
+
+    return false;
+  };
+
+  return {
+    products,
+    getAllProducts,
+    getProductById,
+    addProduct,
+    updateProduct,
+    deleteProduct
+  };
 };
