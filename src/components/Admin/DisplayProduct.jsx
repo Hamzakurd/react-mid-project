@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useContext } from "react";
 import toast from "react-hot-toast";
 
 import {
@@ -17,84 +18,105 @@ import {
   DialogActions,
   TextField,
   Paper,
-  IconButton
+  IconButton,
+  Chip,
+  MenuItem,
+  Stack
 } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import InventoryIcon from "@mui/icons-material/Inventory2";
 
-// Read saved products
-const getSavedProducts = () => {
-  try {
-    const saved = JSON.parse(
-      localStorage.getItem("evWiseProducts") || "[]"
-    );
+import { ProductsContext } from "../Context/ProductsContext";
 
-    return Array.isArray(saved) ? saved : [];
-  } catch {
-    return [];
-  }
-};
+const categories = [
+  "Chargers",
+  "Batteries",
+  "Motors",
+  "Spare Parts",
+  "Accessories"
+];
 
 const emptyProduct = {
   name: "",
-  description: ""
+  description: "",
+  category: "Chargers",
+  price: "",
+  stock: "",
+  image: "",
+  compatibleModels: ""
+};
+
+const normalizeImageUrl = (value) => {
+  const rawImage = value.trim();
+
+  if (!rawImage) return "";
+
+  if (rawImage.startsWith("//")) {
+    return `https:${rawImage}`;
+  }
+
+  if (/^https?:\/\//i.test(rawImage)) {
+    return rawImage;
+  }
+
+  if (rawImage.startsWith("/")) {
+    return rawImage;
+  }
+
+  if (/^[a-z][a-z0-9+.-]*:/i.test(rawImage)) {
+    return null;
+  }
+
+  return `https://${rawImage}`;
 };
 
 export default function DisplayProducts() {
-  const [products, setProducts] = useState(getSavedProducts);
+  const {
+    products,
+    addProduct,
+    updateProduct,
+    deleteProduct
+  } = useContext(ProductsContext);
 
   const [openForm, setOpenForm] = useState(false);
-
   const [editingId, setEditingId] = useState(null);
+  const [formData, setFormData] = useState({
+    ...emptyProduct
+  });
 
-  const [formData, setFormData] = useState(emptyProduct);
-
-  // SAVE PRODUCTS
-  const saveProducts = (updatedProducts) => {
-    try {
-      localStorage.setItem(
-        "evWiseProducts",
-        JSON.stringify(updatedProducts)
-      );
-
-      setProducts(updatedProducts);
-      return true;
-    } catch (error) {
-      console.error("Failed to save products:", error);
-      toast.error("Unable to save products!");
-      return false;
-    }
-  };
-
-  // OPEN ADD FORM
   const handleAdd = () => {
     setEditingId(null);
-    setFormData(emptyProduct);
+    setFormData({ ...emptyProduct });
     setOpenForm(true);
   };
 
-  // OPEN EDIT FORM
   const handleEdit = (product) => {
     setEditingId(product.id);
 
     setFormData({
-      name: product.name,
-      description: product.description
+      name: product.name || "",
+      description: product.description || "",
+      category: product.category || "Spare Parts",
+      price: product.price ?? "",
+      stock: product.stock ?? "",
+      image: product.image || "",
+      compatibleModels: Array.isArray(product.compatibleModels)
+        ? product.compatibleModels.join(", ")
+        : product.compatibleModels || ""
     });
 
     setOpenForm(true);
   };
 
-  // CLOSE FORM
   const handleClose = () => {
     setOpenForm(false);
     setEditingId(null);
-    setFormData(emptyProduct);
+    setFormData({ ...emptyProduct });
   };
 
-  // HANDLE INPUT CHANGE
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -104,61 +126,103 @@ export default function DisplayProducts() {
     }));
   };
 
-  // ADD OR UPDATE PRODUCT
   const handleSubmit = (e) => {
     e.preventDefault();
 
     const name = formData.name.trim();
     const description = formData.description.trim();
+    const category = formData.category;
+    const price = Number(formData.price);
+    const stock = Number(formData.stock);
 
-    if (!name || !description) {
-      toast.error("Please fill all fields!");
+    const image = normalizeImageUrl(formData.image);
+
+    const compatibleModels = formData.compatibleModels
+      .split(",")
+      .map((model) => model.trim())
+      .filter(Boolean);
+
+    if (!name || !description || !category) {
+      toast.error("Please fill all required fields!");
       return;
     }
 
-    if (editingId !== null) {
-      const updatedProducts = products.map((product) =>
-        product.id === editingId
-          ? {
-              ...product,
-              name,
-              description
-            }
-          : product
-      );
+    if (
+      formData.price === "" ||
+      !Number.isFinite(price) ||
+      price <= 0
+    ) {
+      toast.error("Please enter a valid price!");
+      return;
+    }
 
-      if (saveProducts(updatedProducts)) {
-        toast.success("Product updated successfully!");
-        handleClose();
+    if (
+      formData.stock === "" ||
+      !Number.isInteger(stock) ||
+      stock < 0
+    ) {
+      toast.error("Please enter a valid stock quantity!");
+      return;
+    }
+
+    if (image === null) {
+      toast.error("Please enter a valid image URL!");
+      return;
+    }
+
+    if (image && !image.startsWith("/")) {
+      try {
+        const url = new URL(image);
+
+        if (
+          !["http:", "https:"].includes(url.protocol) ||
+          !url.hostname.includes(".")
+        ) {
+          throw new Error("Invalid image URL");
+        }
+      } catch {
+        toast.error("Please enter a valid image URL!");
+        return;
       }
-
-      return;
     }
 
-    const newProduct = {
-      id: crypto.randomUUID(),
+    const data = {
       name,
-      description
+      description,
+      category,
+      price,
+      stock,
+      image,
+      compatibleModels
     };
 
-    const updatedProducts = [...products, newProduct];
-
-    if (saveProducts(updatedProducts)) {
+    if (editingId !== null) {
+      updateProduct(editingId, data);
+      toast.success("Product updated successfully!");
+    } else {
+      addProduct(data);
       toast.success("Product added successfully!");
-      handleClose();
     }
+
+    handleClose();
   };
 
-  // DELETE PRODUCT
-  const deleteProduct = (id) => {
-    const updatedProducts = products.filter(
-      (product) => product.id !== id
+  const handleDelete = (id) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this product?"
     );
 
-    if (saveProducts(updatedProducts)) {
-      toast.success("Product deleted successfully!");
-    }
+    if (!confirmed) return;
+
+    deleteProduct(id);
+    toast.success("Product deleted successfully!");
   };
+
+  const totalStock = products.reduce(
+    (total, product) =>
+      total + (Number(product.stock) || 0),
+    0
+  );
 
   return (
     <Box
@@ -167,12 +231,11 @@ export default function DisplayProducts() {
         minWidth: 0,
         minHeight: "100vh",
         boxSizing: "border-box",
-        backgroundColor: "#eff7fd",
+        bgcolor: "background.default",
+        color: "text.primary",
         p: { xs: 2, md: 4 }
       }}
     >
-      {/* PAGE HEADER */}
-
       <Box
         sx={{
           display: "flex",
@@ -199,7 +262,7 @@ export default function DisplayProducts() {
           <Typography
             variant="h4"
             sx={{
-              color: "#092b40",
+              color: "text.primary",
               fontWeight: 800,
               fontSize: { xs: 25, md: 34 }
             }}
@@ -209,12 +272,12 @@ export default function DisplayProducts() {
 
           <Typography
             sx={{
-              color: "#164b91",
+              color: "text.secondary",
               mt: 1,
               fontSize: 14
             }}
           >
-            Add, edit and delete your products.
+            Manage products for the EV Wise Shop.
           </Typography>
         </Box>
 
@@ -223,16 +286,15 @@ export default function DisplayProducts() {
           startIcon={<AddIcon />}
           onClick={handleAdd}
           sx={{
-            backgroundColor: "#10b981",
-            color: "white",
+            bgcolor: "#10b981",
+            color: "#ffffff",
             fontWeight: 700,
             borderRadius: 2,
             px: 3,
             py: 1.3,
             textTransform: "none",
-
             "&:hover": {
-              backgroundColor: "#059669"
+              bgcolor: "#059669"
             }
           }}
         >
@@ -240,66 +302,113 @@ export default function DisplayProducts() {
         </Button>
       </Box>
 
-      {/* PRODUCTS TABLE */}
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        spacing={2}
+        sx={{ mb: 4 }}
+      >
+        <Paper
+          elevation={0}
+          sx={{
+            p: 3,
+            flex: 1,
+            borderRadius: 3,
+            bgcolor: "background.paper",
+            border: "1px solid",
+            borderColor: "divider"
+          }}
+        >
+          <Typography
+            sx={{
+              color: "text.secondary",
+              mb: 1,
+              fontSize: 13
+            }}
+          >
+            Total Products
+          </Typography>
+
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: 800,
+              color: "#10b981"
+            }}
+          >
+            {products.length}
+          </Typography>
+        </Paper>
+
+        <Paper
+          elevation={0}
+          sx={{
+            p: 3,
+            flex: 1,
+            borderRadius: 3,
+            bgcolor: "background.paper",
+            border: "1px solid",
+            borderColor: "divider"
+          }}
+        >
+          <Typography
+            sx={{
+              color: "text.secondary",
+              mb: 1,
+              fontSize: 13
+            }}
+          >
+            Total Stock
+          </Typography>
+
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: 800,
+              color: "text.primary"
+            }}
+          >
+            {totalStock}
+          </Typography>
+        </Paper>
+      </Stack>
 
       <Paper
         elevation={0}
         sx={{
-          borderRadius: 4,
+          borderRadius: 3,
           overflow: "hidden",
-          border: "1px solid #e2edf5",
-          backgroundColor: "white"
+          border: "1px solid",
+          borderColor: "divider",
+          bgcolor: "background.paper"
         }}
       >
-        <TableContainer
-          sx={{
-            width: "100%",
-            overflowX: "auto"
-          }}
-        >
-          <Table sx={{ minWidth: 550 }}>
+        <TableContainer>
+          <Table sx={{ minWidth: 900 }}>
             <TableHead>
               <TableRow
                 sx={{
-                  backgroundColor: "#e8fff7"
+                  bgcolor: "rgba(16,185,129,0.12)"
                 }}
               >
-                <TableCell
-                  sx={{
-                    fontWeight: 800,
-                    color: "#092b40"
-                  }}
-                >
-                  #
-                </TableCell>
-
-                <TableCell
-                  sx={{
-                    fontWeight: 800,
-                    color: "#092b40"
-                  }}
-                >
-                  Name
-                </TableCell>
-
-                <TableCell
-                  sx={{
-                    fontWeight: 800,
-                    color: "#092b40"
-                  }}
-                >
-                  Description
-                </TableCell>
-
-                <TableCell
-                  align="center"
-                  sx={{
-                    fontWeight: 800,
-                    color: "#092b40"
-                  }}
-                >
-                  Actions
-                </TableCell>
+                {[
+                  "#",
+                  "Product",
+                  "Category",
+                  "Price",
+                  "Stock",
+                  "Compatible Models",
+                  "Actions"
+                ].map((heading) => (
+                  <TableCell
+                    key={heading}
+                    sx={{
+                      fontWeight: 800,
+                      color: "text.primary"
+                    }}
+                  >
+                    {heading}
+                  </TableCell>
+                ))}
               </TableRow>
             </TableHead>
 
@@ -307,54 +416,161 @@ export default function DisplayProducts() {
               {products.length === 0 ? (
                 <TableRow>
                   <TableCell
-                    colSpan={4}
+                    colSpan={7}
                     align="center"
-                    sx={{
-                      py: 6,
-                      color: "#718096"
-                    }}
+                    sx={{ py: 7 }}
                   >
-                    No products found. Add your first product.
+                    <InventoryIcon
+                      sx={{
+                        fontSize: 44,
+                        color: "text.secondary",
+                        mb: 1
+                      }}
+                    />
+
+                    <Typography color="text.secondary">
+                      No products found. Add your first product.
+                    </Typography>
                   </TableCell>
                 </TableRow>
               ) : (
                 products.map((product, index) => (
-                  <TableRow
-                    key={product.id}
-                    hover
-                  >
-                    <TableCell
-                      sx={{
-                        color: "#164b91"
-                      }}
-                    >
+                  <TableRow key={product.id} hover>
+                    <TableCell>
                       {index + 1}
                     </TableCell>
 
-                    <TableCell
-                      sx={{
-                        fontWeight: 700,
-                        color: "#092b40"
-                      }}
-                    >
-                      {product.name}
-                    </TableCell>
-
-                    <TableCell
-                      sx={{
-                        color: "#164b91",
-                        maxWidth: 400,
-                        overflowWrap: "anywhere"
-                      }}
-                    >
-                      {product.description}
-                    </TableCell>
-
-                    <TableCell align="center">
+                    <TableCell>
                       <Box
                         sx={{
                           display: "flex",
-                          justifyContent: "center",
+                          alignItems: "center",
+                          gap: 2,
+                          minWidth: 180
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            width: 58,
+                            height: 58,
+                            flexShrink: 0,
+                            borderRadius: 2,
+                            bgcolor: "rgba(16,185,129,0.08)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            overflow: "hidden"
+                          }}
+                        >
+                          {product.image ? (
+                            <Box
+                              component="img"
+                              src={product.image}
+                              alt={product.name}
+                              onError={(e) => {
+                                e.currentTarget.style.display = "none";
+                              }}
+                              sx={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover"
+                              }}
+                            />
+                          ) : (
+                            <InventoryIcon
+                              sx={{ color: "#10b981" }}
+                            />
+                          )}
+                        </Box>
+
+                        <Box sx={{ minWidth: 0 }}>
+                          <Typography
+                            sx={{
+                              color: "text.primary",
+                              fontWeight: 700,
+                              fontSize: 13
+                            }}
+                          >
+                            {product.name}
+                          </Typography>
+
+                          <Typography
+                            sx={{
+                              color: "text.secondary",
+                              fontSize: 12,
+                              mt: 0.5,
+                              maxWidth: 230,
+                              overflowWrap: "anywhere"
+                            }}
+                          >
+                            {product.description}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </TableCell>
+
+                    <TableCell>
+                      <Chip
+                        label={
+                          product.category || "Uncategorized"
+                        }
+                        size="small"
+                        sx={{
+                          color: "#10b981",
+                          bgcolor: "rgba(16,185,129,0.12)",
+                          fontWeight: 700
+                        }}
+                      />
+                    </TableCell>
+
+                    <TableCell>
+                      {product.price !== undefined &&
+                      product.price !== "" &&
+                      product.price !== null &&
+                      Number.isFinite(Number(product.price))
+                        ? `${Number(product.price).toFixed(2)} JOD`
+                        : "—"}
+                    </TableCell>
+
+                    <TableCell>
+                      <Chip
+                        label={
+                          product.stock === undefined ||
+                          product.stock === null ||
+                          product.stock === ""
+                            ? "Not set"
+                            : Number(product.stock) > 0
+                            ? `${product.stock} available`
+                            : "Out of Stock"
+                        }
+                        size="small"
+                        color={
+                          Number(product.stock) > 0
+                            ? "success"
+                            : "default"
+                        }
+                        variant="outlined"
+                      />
+                    </TableCell>
+
+                    <TableCell
+                      sx={{
+                        maxWidth: 180,
+                        overflowWrap: "anywhere",
+                        color: "text.secondary",
+                        fontSize: 12
+                      }}
+                    >
+                      {Array.isArray(product.compatibleModels)
+                        ? product.compatibleModels.join(", ") ||
+                          "Universal"
+                        : product.compatibleModels || "Universal"}
+                    </TableCell>
+
+                    <TableCell>
+                      <Box
+                        sx={{
+                          display: "flex",
                           gap: 1
                         }}
                       >
@@ -362,11 +578,10 @@ export default function DisplayProducts() {
                           aria-label={`Edit ${product.name}`}
                           onClick={() => handleEdit(product)}
                           sx={{
-                            color: "#168cf0",
-                            backgroundColor: "#e1f3ff",
-
+                            color: "#60a5fa",
+                            bgcolor: "rgba(96,165,250,0.12)",
                             "&:hover": {
-                              backgroundColor: "#cce8ff"
+                              bgcolor: "rgba(96,165,250,0.2)"
                             }
                           }}
                         >
@@ -375,13 +590,14 @@ export default function DisplayProducts() {
 
                         <IconButton
                           aria-label={`Delete ${product.name}`}
-                          onClick={() => deleteProduct(product.id)}
+                          onClick={() =>
+                            handleDelete(product.id)
+                          }
                           sx={{
-                            color: "#ef4444",
-                            backgroundColor: "#fee2e2",
-
+                            color: "#f87171",
+                            bgcolor: "rgba(248,113,113,0.12)",
                             "&:hover": {
-                              backgroundColor: "#fecaca"
+                              bgcolor: "rgba(248,113,113,0.2)"
                             }
                           }}
                         >
@@ -397,18 +613,18 @@ export default function DisplayProducts() {
         </TableContainer>
       </Paper>
 
-      {/* ADD / EDIT PRODUCT DIALOG */}
-
       <Dialog
         open={openForm}
         onClose={handleClose}
         fullWidth
         maxWidth="sm"
+        scroll="paper"
         slotProps={{
           paper: {
             sx: {
-              borderRadius: 4,
-              p: { xs: 1, sm: 2 }
+              borderRadius: 3,
+              bgcolor: "background.paper",
+              color: "text.primary"
             }
           }
         }}
@@ -420,9 +636,9 @@ export default function DisplayProducts() {
         >
           <DialogTitle
             sx={{
-              color: "#092b40",
               fontWeight: 800,
-              fontSize: 24
+              fontSize: 24,
+              color: "text.primary"
             }}
           >
             {editingId !== null
@@ -430,12 +646,12 @@ export default function DisplayProducts() {
               : "Add Product"}
           </DialogTitle>
 
-          <DialogContent>
+          <DialogContent dividers>
             <Typography
               sx={{
-                color: "#164b91",
+                color: "text.secondary",
                 fontSize: 14,
-                mb: 3
+                mb: 2
               }}
             >
               Enter the product information below.
@@ -443,35 +659,116 @@ export default function DisplayProducts() {
 
             <TextField
               fullWidth
+              required
+              margin="normal"
               label="Product Name"
               name="name"
+              placeholder="Volkswagen ID.4 Electric Motor"
               value={formData.name}
               onChange={handleChange}
-              sx={{ mb: 3 }}
             />
 
             <TextField
               fullWidth
+              required
+              select
+              margin="normal"
+              label="Category"
+              name="category"
+              value={formData.category}
+              onChange={handleChange}
+            >
+              {categories.map((category) => (
+                <MenuItem
+                  key={category}
+                  value={category}
+                >
+                  {category}
+                </MenuItem>
+              ))}
+            </TextField>
+
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={2}
+              sx={{ mt: 2 }}
+            >
+              <TextField
+                fullWidth
+                required
+                type="number"
+                label="Price (JOD)"
+                name="price"
+                placeholder="250"
+                value={formData.price}
+                onChange={handleChange}
+                slotProps={{
+                  htmlInput: {
+                    min: 0.01,
+                    step: 0.01
+                  }
+                }}
+              />
+
+              <TextField
+                fullWidth
+                required
+                type="number"
+                label="Stock Quantity"
+                name="stock"
+                placeholder="10"
+                value={formData.stock}
+                onChange={handleChange}
+                slotProps={{
+                  htmlInput: {
+                    min: 0,
+                    step: 1
+                  }
+                }}
+              />
+            </Stack>
+
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Image URL"
+              name="image"
+              placeholder="example.com/product.jpg"
+              helperText="You can enter a full URL, a URL without https://, or a local path such as /images/motor.jpg."
+              value={formData.image}
+              onChange={handleChange}
+            />
+
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Compatible Models"
+              name="compatibleModels"
+              placeholder="ID.4, IONIQ 5, IONIQ 6"
+              helperText="Separate vehicle models with commas."
+              value={formData.compatibleModels}
+              onChange={handleChange}
+            />
+
+            <TextField
+              fullWidth
+              required
               multiline
-              rows={4}
+              minRows={3}
+              margin="normal"
               label="Description"
               name="description"
+              placeholder="Enter product specifications and details"
               value={formData.description}
               onChange={handleChange}
             />
           </DialogContent>
 
-          <DialogActions
-            sx={{
-              px: 3,
-              pb: 2,
-              gap: 1
-            }}
-          >
+          <DialogActions sx={{ p: 2, gap: 1 }}>
             <Button
               onClick={handleClose}
               sx={{
-                color: "#164b91",
+                color: "text.secondary",
                 fontWeight: 700,
                 textTransform: "none"
               }}
@@ -483,12 +780,12 @@ export default function DisplayProducts() {
               type="submit"
               variant="contained"
               sx={{
-                backgroundColor: "#10b981",
+                bgcolor: "#10b981",
+                color: "#ffffff",
                 fontWeight: 700,
                 textTransform: "none",
-
                 "&:hover": {
-                  backgroundColor: "#059669"
+                  bgcolor: "#059669"
                 }
               }}
             >

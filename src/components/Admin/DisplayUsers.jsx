@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import toast from "react-hot-toast";
 
@@ -39,24 +40,15 @@ const emptyUser = {
 };
 
 export default function DisplayUsers() {
-  const {
-    users,
-    setUsers,
-    currentUser
-  } = useAuth();
+  const { users, setUsers, currentUser } = useAuth();
 
   const [openForm, setOpenForm] = useState(false);
-
-  const [formData, setFormData] = useState(emptyUser);
-
+  const [formData, setFormData] = useState({ ...emptyUser });
   const [editingId, setEditingId] = useState(null);
   const [selectedRole, setSelectedRole] = useState("user");
-
   const [deleteTarget, setDeleteTarget] = useState(null);
 
   const userList = Array.isArray(users) ? users : [];
-
-  // SAVE USERS
 
   const saveUsers = (updatedUsers) => {
     try {
@@ -66,7 +58,6 @@ export default function DisplayUsers() {
       );
 
       setUsers(updatedUsers);
-
       return true;
     } catch (error) {
       console.error("Error saving users:", error);
@@ -75,21 +66,15 @@ export default function DisplayUsers() {
     }
   };
 
-  // OPEN ADD FORM
-
   const handleOpenForm = () => {
-    setFormData(emptyUser);
+    setFormData({ ...emptyUser });
     setOpenForm(true);
   };
 
-  // CLOSE ADD FORM
-
   const handleCloseForm = () => {
     setOpenForm(false);
-    setFormData(emptyUser);
+    setFormData({ ...emptyUser });
   };
-
-  // HANDLE INPUTS
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -99,8 +84,6 @@ export default function DisplayUsers() {
       [name]: value
     }));
   };
-
-  // ADD USER
 
   const handleAddUser = (event) => {
     event.preventDefault();
@@ -162,21 +145,15 @@ export default function DisplayUsers() {
     }
   };
 
-  // START EDITING ROLE
-
   const handleEditRole = (user) => {
     setEditingId(user.id);
     setSelectedRole(user.role || "user");
   };
 
-  // CANCEL EDITING
-
   const handleCancelEdit = () => {
     setEditingId(null);
     setSelectedRole("user");
   };
-
-  // SAVE ROLE
 
   const handleSaveRole = (user) => {
     if (
@@ -211,8 +188,6 @@ export default function DisplayUsers() {
     }
   };
 
-  // OPEN DELETE CONFIRMATION
-
   const handleDeleteClick = (user) => {
     if (currentUser?.id === user.id) {
       toast.error("You cannot delete your own account!");
@@ -221,8 +196,6 @@ export default function DisplayUsers() {
 
     setDeleteTarget(user);
   };
-
-  // DELETE USER
 
   const handleConfirmDelete = () => {
     if (!deleteTarget) return;
@@ -250,12 +223,11 @@ export default function DisplayUsers() {
         minWidth: 0,
         minHeight: "100vh",
         boxSizing: "border-box",
-        backgroundColor: "#eff7fd",
+        bgcolor: "background.default",
+        color: "text.primary",
         p: { xs: 2, md: 4 }
       }}
     >
-      {/* PAGE HEADER */}
-
       <Box
         sx={{
           display: "flex",
@@ -282,7 +254,7 @@ export default function DisplayUsers() {
           <Typography
             variant="h4"
             sx={{
-              color: "#092b40",
+              color: "text.primary",
               fontWeight: 800,
               fontSize: { xs: 25, md: 34 }
             }}
@@ -292,7 +264,7 @@ export default function DisplayUsers() {
 
           <Typography
             sx={{
-              color: "#164b91",
+              color: "text.secondary",
               fontSize: 14,
               mt: 1
             }}
@@ -306,15 +278,15 @@ export default function DisplayUsers() {
           startIcon={<AddIcon />}
           onClick={handleOpenForm}
           sx={{
-            backgroundColor: "#10b981",
-            color: "white",
+            bgcolor: "#10b981",
+            color: "#ffffff",
             fontWeight: 700,
             borderRadius: 2,
             px: 3,
             py: 1.3,
             textTransform: "none",
             "&:hover": {
-              backgroundColor: "#059669"
+              bgcolor: "#059669"
             }
           }}
         >
@@ -322,15 +294,14 @@ export default function DisplayUsers() {
         </Button>
       </Box>
 
-      {/* USERS TABLE */}
-
       <Paper
         elevation={0}
         sx={{
-          borderRadius: 4,
-          border: "1px solid #e2edf5",
+          borderRadius: 3,
+          border: "1px solid",
+          borderColor: "divider",
           overflow: "hidden",
-          backgroundColor: "white"
+          bgcolor: "background.paper"
         }}
       >
         <TableContainer sx={{ overflowX: "auto" }}>
@@ -338,7 +309,7 @@ export default function DisplayUsers() {
             <TableHead>
               <TableRow
                 sx={{
-                  backgroundColor: "#e8fff7"
+                  bgcolor: "rgba(16,185,129,0.12)"
                 }}
               >
                 {["#", "Name", "Email", "Role", "Actions"].map(
@@ -346,7 +317,7 @@ export default function DisplayUsers() {
                     <TableCell
                       key={heading}
                       sx={{
-                        color: "#092b40",
+                        color: "text.primary",
                         fontWeight: 800
                       }}
                     >
@@ -365,7 +336,7 @@ export default function DisplayUsers() {
                     align="center"
                     sx={{
                       py: 6,
-                      color: "#718096"
+                      color: "text.secondary"
                     }}
                   >
                     No users found.
@@ -381,13 +352,13 @@ export default function DisplayUsers() {
 
                   return (
                     <TableRow key={user.id} hover>
-                      <TableCell>
+                      <TableCell sx={{ color: "text.secondary" }}>
                         {index + 1}
                       </TableCell>
 
                       <TableCell
                         sx={{
-                          color: "#092b40",
+                          color: "text.primary",
                           fontWeight: 700
                         }}
                       >
@@ -397,7 +368,8 @@ export default function DisplayUsers() {
 
                       <TableCell
                         sx={{
-                          color: "#164b91"
+                          color: "text.secondary",
+                          overflowWrap: "anywhere"
                         }}
                       >
                         {user.email}
@@ -439,12 +411,12 @@ export default function DisplayUsers() {
                               fontWeight: 700,
                               color:
                                 user.role === "admin"
-                                  ? "#065f46"
-                                  : "#164b91",
-                              backgroundColor:
+                                  ? "#34d399"
+                                  : "#60a5fa",
+                              bgcolor:
                                 user.role === "admin"
-                                  ? "#d1fae5"
-                                  : "#e1f3ff"
+                                  ? "rgba(16,185,129,0.15)"
+                                  : "rgba(96,165,250,0.15)"
                             }}
                           />
                         )}
@@ -467,9 +439,10 @@ export default function DisplayUsers() {
                                   handleSaveRole(user)
                                 }
                                 sx={{
-                                  backgroundColor: "#10b981",
+                                  bgcolor: "#10b981",
+                                  color: "#ffffff",
                                   "&:hover": {
-                                    backgroundColor: "#059669"
+                                    bgcolor: "#059669"
                                   }
                                 }}
                               >
@@ -480,7 +453,7 @@ export default function DisplayUsers() {
                                 size="small"
                                 onClick={handleCancelEdit}
                                 sx={{
-                                  color: "#164b91"
+                                  color: "text.secondary"
                                 }}
                               >
                                 Cancel
@@ -493,8 +466,11 @@ export default function DisplayUsers() {
                                 handleEditRole(user)
                               }
                               sx={{
-                                color: "#168cf0",
-                                backgroundColor: "#e1f3ff"
+                                color: "#60a5fa",
+                                bgcolor: "rgba(96,165,250,0.12)",
+                                "&:hover": {
+                                  bgcolor: "rgba(96,165,250,0.2)"
+                                }
                               }}
                             >
                               <EditIcon />
@@ -508,11 +484,14 @@ export default function DisplayUsers() {
                               handleDeleteClick(user)
                             }
                             sx={{
-                              color: "#ef4444",
-                              backgroundColor: "#fee2e2",
+                              color: "#f87171",
+                              bgcolor: "rgba(248,113,113,0.12)",
+                              "&:hover": {
+                                bgcolor: "rgba(248,113,113,0.2)"
+                              },
                               "&.Mui-disabled": {
-                                backgroundColor: "#f1f5f9",
-                                color: "#94a3b8"
+                                bgcolor: "rgba(255,255,255,0.04)",
+                                color: "text.disabled"
                               }
                             }}
                           >
@@ -529,13 +508,22 @@ export default function DisplayUsers() {
         </TableContainer>
       </Paper>
 
-      {/* ADD USER DIALOG */}
-
       <Dialog
         open={openForm}
         onClose={handleCloseForm}
         fullWidth
         maxWidth="sm"
+        slotProps={{
+          paper: {
+            sx: {
+              bgcolor: "background.paper",
+              color: "text.primary",
+              borderRadius: 3,
+              border: "1px solid",
+              borderColor: "divider"
+            }
+          }
+        }}
       >
         <Box
           component="form"
@@ -544,16 +532,17 @@ export default function DisplayUsers() {
         >
           <DialogTitle
             sx={{
-              color: "#092b40",
+              color: "text.primary",
               fontWeight: 800
             }}
           >
             Add New User
           </DialogTitle>
 
-          <DialogContent>
+          <DialogContent dividers>
             <TextField
               fullWidth
+              required
               label="Full Name"
               name="name"
               value={formData.name}
@@ -563,6 +552,7 @@ export default function DisplayUsers() {
 
             <TextField
               fullWidth
+              required
               label="Email Address"
               name="email"
               type="email"
@@ -573,6 +563,7 @@ export default function DisplayUsers() {
 
             <TextField
               fullWidth
+              required
               label="Password"
               name="password"
               type="password"
@@ -608,7 +599,7 @@ export default function DisplayUsers() {
             <Button
               onClick={handleCloseForm}
               sx={{
-                color: "#164b91"
+                color: "text.secondary"
               }}
             >
               Cancel
@@ -618,9 +609,10 @@ export default function DisplayUsers() {
               type="submit"
               variant="contained"
               sx={{
-                backgroundColor: "#10b981",
+                bgcolor: "#10b981",
+                color: "#ffffff",
                 "&:hover": {
-                  backgroundColor: "#059669"
+                  bgcolor: "#059669"
                 }
               }}
             >
@@ -630,17 +622,26 @@ export default function DisplayUsers() {
         </Box>
       </Dialog>
 
-      {/* DELETE CONFIRMATION DIALOG */}
-
       <Dialog
         open={Boolean(deleteTarget)}
         onClose={() => setDeleteTarget(null)}
         fullWidth
         maxWidth="xs"
+        slotProps={{
+          paper: {
+            sx: {
+              bgcolor: "background.paper",
+              color: "text.primary",
+              borderRadius: 3,
+              border: "1px solid",
+              borderColor: "divider"
+            }
+          }
+        }}
       >
         <DialogTitle
           sx={{
-            color: "#092b40",
+            color: "text.primary",
             fontWeight: 800
           }}
         >
@@ -648,9 +649,18 @@ export default function DisplayUsers() {
         </DialogTitle>
 
         <DialogContent>
-          <Typography sx={{ color: "#164b91" }}>
+          <Typography sx={{ color: "text.secondary" }}>
             Are you sure you want to delete{" "}
-            <strong>{deleteTarget?.name}</strong>?
+            <Box
+              component="span"
+              sx={{
+                color: "text.primary",
+                fontWeight: 800
+              }}
+            >
+              {deleteTarget?.name}
+            </Box>
+            ?
           </Typography>
         </DialogContent>
 
@@ -658,7 +668,7 @@ export default function DisplayUsers() {
           <Button
             onClick={() => setDeleteTarget(null)}
             sx={{
-              color: "#164b91"
+              color: "text.secondary"
             }}
           >
             Cancel

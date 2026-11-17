@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 
 import {
@@ -7,19 +8,30 @@ import {
   Typography,
   Paper,
   Divider,
-  InputAdornment
+  InputAdornment,
+  Alert
 } from "@mui/material";
 
 import PersonIcon from "@mui/icons-material/Person";
 import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 import { useAuth } from "../Hooks/UseAuth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const requestedPath = location.state?.from;
+
+  const redirectPath =
+    typeof requestedPath === "string" &&
+    ["/Checkout", "/MyOrders"].includes(requestedPath)
+      ? requestedPath
+      : "/";
 
   const [userData, setUserData] = useState({
     name: "",
@@ -29,22 +41,53 @@ export default function Register() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleRegister = async (e) => {
     e.preventDefault();
 
     if (loading) return;
 
+    setError("");
+
+    const name = userData.name.trim();
+    const email = userData.email.trim().toLowerCase();
+
+    if (
+      !name ||
+      !email ||
+      !userData.password ||
+      !userData.confirmPassword
+    ) {
+      setError("Please fill in all fields.");
+      return;
+    }
+
+    if (userData.password !== userData.confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const success = await register(userData);
+      const success = await register({
+        ...userData,
+        name,
+        email
+      });
 
       if (success) {
-        navigate("/Login");
+        navigate("/Login", {
+          replace: true,
+          state: {
+            from: redirectPath
+          }
+        });
       }
     } catch (error) {
       console.error("Register error:", error);
+      setError("Unable to create your account. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -85,13 +128,18 @@ export default function Register() {
     <Box
       sx={{
         flex: 1,
-        minHeight: 0,
+        minHeight: "80vh",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: "#f2f7fb",
+        bgcolor: (theme) =>
+          theme.palette.mode === "dark"
+            ? "background.default"
+            : "#f2f7fb",
+        color: "text.primary",
         px: 2,
-        py: 3
+        py: 3,
+        transition: "background-color 0.3s, color 0.3s"
       }}
     >
       <Paper
@@ -101,15 +149,49 @@ export default function Register() {
           maxWidth: 480,
           borderRadius: 4,
           p: { xs: 3, sm: 5 },
-          backgroundColor: "white",
-          boxShadow: "0 8px 35px rgba(0,0,0,0.08)"
+          bgcolor: "background.paper",
+          color: "text.primary",
+          boxShadow: (theme) =>
+            theme.palette.mode === "dark"
+              ? "0 8px 35px rgba(0,0,0,0.35)"
+              : "0 8px 35px rgba(0,0,0,0.08)"
         }}
       >
+        {redirectPath === "/Checkout" && (
+          <Box
+            sx={{
+              mb: 3,
+              p: 2,
+              borderRadius: 2,
+              bgcolor: "rgba(16,185,129,0.1)",
+              border: "1px solid rgba(16,185,129,0.3)"
+            }}
+          >
+            <Typography
+              sx={{
+                color: "#10b981",
+                fontWeight: 800,
+                fontSize: 14,
+                mb: 0.5
+              }}
+            >
+              Almost there!
+            </Typography>
+
+            <Typography
+              color="text.secondary"
+              sx={{ fontSize: 13 }}
+            >
+              Create an account to continue your checkout.
+            </Typography>
+          </Box>
+        )}
+
         <Typography
           sx={{
             fontSize: 30,
             fontWeight: 800,
-            color: "#092b40"
+            color: "text.primary"
           }}
         >
           Create Account
@@ -117,7 +199,7 @@ export default function Register() {
 
         <Typography
           sx={{
-            color: "#718096",
+            color: "text.secondary",
             mt: 1,
             mb: 4
           }}
@@ -125,18 +207,31 @@ export default function Register() {
           Create your account to get started.
         </Typography>
 
-        {/* REGISTER FORM */}
+        {error && (
+          <Alert
+            severity="error"
+            sx={{
+              mb: 3,
+              borderRadius: 2
+            }}
+          >
+            {error}
+          </Alert>
+        )}
+
         <Box
           component="form"
           onSubmit={handleRegister}
-          noValidate
         >
           {fields.map((field) => (
             <Box key={field.name}>
               <Typography
-                fontWeight="bold"
-                fontSize={14}
-                sx={{ mb: 1 }}
+                sx={{
+                  fontWeight: "bold",
+                  fontSize: 14,
+                  color: "text.primary",
+                  mb: 1
+                }}
               >
                 {field.label}
               </Typography>
@@ -164,7 +259,8 @@ export default function Register() {
                 sx={{
                   mb: 3,
                   "& .MuiOutlinedInput-root": {
-                    borderRadius: 2
+                    borderRadius: 2,
+                    bgcolor: "background.paper"
                   }
                 }}
                 slotProps={{
@@ -206,7 +302,7 @@ export default function Register() {
         <Typography
           sx={{
             textAlign: "center",
-            color: "#718096",
+            color: "text.secondary",
             fontSize: 14
           }}
         >
@@ -215,7 +311,11 @@ export default function Register() {
 
         <Button
           fullWidth
-          onClick={() => navigate("/Login")}
+          onClick={() =>
+            navigate("/Login", {
+              state: { from: redirectPath }
+            })
+          }
           sx={{
             mt: 1,
             color: "#16a879",
@@ -224,6 +324,21 @@ export default function Register() {
         >
           Login
         </Button>
+
+        {redirectPath === "/Checkout" && (
+          <Button
+            fullWidth
+            startIcon={<ArrowBackIcon />}
+            onClick={() => navigate("/Cart")}
+            sx={{
+              mt: 2,
+              color: "text.secondary",
+              textTransform: "none"
+            }}
+          >
+            Back to Cart
+          </Button>
+        )}
       </Paper>
     </Box>
   );

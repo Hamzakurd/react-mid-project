@@ -1,3 +1,6 @@
+
+import { useContext } from "react";
+
 import {
   Box,
   Typography,
@@ -16,67 +19,37 @@ import {
 } from "@mui/icons-material";
 
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "@mui/material/styles";
+import { CarsContext } from "../Context/CarsContext";
 
-// FEATURES DATA
 const features = [
   {
     icon: <EnergySavingsLeafIcon />,
     title: "Eco Friendly",
-    description: "Reduce emissions and help create a cleaner planet."
+    description:
+      "Reduce emissions and help create a cleaner planet."
   },
   {
     icon: <AttachMoney />,
     title: "Lower Running Costs",
-    description: "Save money with lower charging and maintenance costs."
+    description:
+      "Save money with lower charging and maintenance costs."
   },
   {
     icon: <Bolt />,
     title: "Advanced Technology",
-    description: "Experience innovation, safety and smart features."
-  }
-];
-
-// CARS DATA
-const cars = [
-  {
-    name: "Tesla Model 3",
-    image: "/tesla.jpg",
-    range: "520 km",
-    charging: "15 min (10–80%)",
-    brand: "tesla"
-  },
-  {
-    name: "Hyundai IONIQ 5",
-    image: "/ioniq5.jpg",
-    range: "620 km",
-    charging: "18 min (10–80%)",
-    brand: "hyundai"
-  },
-  {
-    name: "BMW i4",
-    image: "/bmw.jpg",
-    range: "590 km",
-    charging: "31 min (10–80%)",
-    brand: "bmw"
-  },
-  {
-    name: "Nissan Leaf",
-    image: "/nissan.jpg",
-    range: "300 km",
-    charging: "60 min (10–80%)",
-    brand: "nissan"
-  },
-  {
-    name: "Kia EV6",
-    image: "/EV6.jpg",
-    range: "620 km",
-    charging: "24 min (10–80%)",
-    brand: "kia"
+    description:
+      "Experience innovation, safety and smart features."
   }
 ];
 
 export default function Home() {
   const navigate = useNavigate();
+  const muiTheme = useTheme();
+  const isDark = muiTheme.palette.mode === "dark";
+
+  const { cars } = useContext(CarsContext);
+  const featuredCars = cars.slice(0, 5);
 
   return (
     <Box
@@ -85,21 +58,18 @@ export default function Home() {
         maxWidth: "100%",
         minWidth: 0,
         overflowX: "clip",
-        boxSizing: "border-box"
+        boxSizing: "border-box",
+        bgcolor: "background.default",
+        color: "text.primary"
       }}
     >
-
-      {/* HERO SECTION */}
-
       <Box
         sx={{
           width: "100%",
           maxWidth: "100%",
           minWidth: 0,
           boxSizing: "border-box",
-
           minHeight: { xs: 420, md: 410 },
-
           backgroundImage: `
             linear-gradient(
               90deg,
@@ -108,14 +78,11 @@ export default function Home() {
             ),
             url("/id4.jpg")
           `,
-
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
-
           display: "flex",
           alignItems: "center",
-
           px: { xs: 3, md: 9 }
         }}
       >
@@ -162,28 +129,23 @@ export default function Home() {
         </Box>
       </Box>
 
-      {/* FEATURES SECTION */}
-
       <Box
         id="features"
         sx={{
-          backgroundColor: "#ffffff",
+          backgroundColor: "background.default",
           py: 3,
           scrollMarginTop: 2
         }}
       >
         <Container maxWidth="xl">
-
           <Box
             sx={{
               display: "grid",
-
               gridTemplateColumns: {
                 xs: "minmax(0, 1fr)",
                 sm: "repeat(2, minmax(0, 1fr))",
                 md: "repeat(3, minmax(0, 1fr))"
               },
-
               gap: 3,
               alignItems: "stretch",
               minWidth: 0
@@ -200,9 +162,6 @@ export default function Home() {
                   minWidth: 0
                 }}
               >
-
-                {/* FEATURE ICON */}
-
                 <Box
                   sx={{
                     minWidth: 68,
@@ -210,25 +169,26 @@ export default function Home() {
                     height: 68,
                     flexShrink: 0,
                     borderRadius: 3,
-
-                    backgroundColor:
-                      index === 1
-                        ? "#e1f3ff"
+                    backgroundColor: isDark
+                      ? index === 1
+                        ? "#15344b"
                         : index === 2
-                        ? "#eeeaff"
-                        : "#dcf9ee",
-
+                        ? "#30294b"
+                        : "#163f34"
+                      : index === 1
+                      ? "#e1f3ff"
+                      : index === 2
+                      ? "#eeeaff"
+                      : "#dcf9ee",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-
                     color:
                       index === 1
                         ? "#168cf0"
                         : index === 2
                         ? "#7655ff"
                         : "#10b981",
-
                     "& .MuiSvgIcon-root": {
                       fontSize: 38
                     }
@@ -237,13 +197,11 @@ export default function Home() {
                   {feature.icon}
                 </Box>
 
-                {/* FEATURE TEXT */}
-
                 <Box sx={{ minWidth: 0 }}>
                   <Typography
                     sx={{
                       fontWeight: 800,
-                      color: "#092b40",
+                      color: "text.primary",
                       mb: 0.5
                     }}
                   >
@@ -253,7 +211,7 @@ export default function Home() {
                   <Typography
                     sx={{
                       fontSize: 14,
-                      color: "#164b91",
+                      color: "text.secondary",
                       lineHeight: 1.5,
                       overflowWrap: "break-word"
                     }}
@@ -261,28 +219,21 @@ export default function Home() {
                     {feature.description}
                   </Typography>
                 </Box>
-
               </Box>
             ))}
           </Box>
-
         </Container>
       </Box>
-
-      {/* POPULAR ELECTRIC CARS */}
 
       <Box
         id="cars"
         sx={{
-          backgroundColor: "#eff7fd",
+          backgroundColor: isDark ? "#172127" : "#eff7fd",
           py: 3,
           scrollMarginTop: 2
         }}
       >
         <Container maxWidth="xl">
-
-          {/* SECTION LABEL */}
-
           <Typography
             sx={{
               color: "#10b981",
@@ -293,8 +244,6 @@ export default function Home() {
           >
             FEATURED EVs
           </Typography>
-
-          {/* SECTION HEADER */}
 
           <Box
             sx={{
@@ -311,7 +260,7 @@ export default function Home() {
               variant="h4"
               sx={{
                 fontWeight: 800,
-                color: "#092b40",
+                color: "text.primary",
                 fontSize: { xs: 24, sm: 29 }
               }}
             >
@@ -330,196 +279,188 @@ export default function Home() {
             </Button>
           </Box>
 
-          {/* CARS GRID */}
-
-          <Box
-            sx={{
-              display: "grid",
-
-              gridTemplateColumns: {
-                xs: "minmax(0, 1fr)",
-                sm: "repeat(2, minmax(0, 1fr))",
-                md: "repeat(3, minmax(0, 1fr))",
-                lg: "repeat(5, minmax(0, 1fr))"
-              },
-
-              gap: 2.5,
-              alignItems: "stretch",
-              minWidth: 0
-            }}
-          >
-            {cars.map((car) => (
-              <Card
-                key={car.brand}
-                sx={{
-                  height: "100%",
-                  minWidth: 0,
-                  minHeight: 310,
-
-                  borderRadius: 3,
-                  boxShadow: "none",
-                  backgroundColor: "white",
-
-                  p: 1.5,
-                  boxSizing: "border-box",
-
-                  display: "flex",
-                  flexDirection: "column",
-
-                  transition: "0.3s",
-
-                  "&:hover": {
-                    transform: "translateY(-4px)",
-                    boxShadow: "0 8px 24px rgba(0,0,0,0.08)"
-                  }
-                }}
+          {featuredCars.length === 0 ? (
+            <Box
+              sx={{
+                textAlign: "center",
+                py: 6
+              }}
+            >
+              <Typography
+                variant="h6"
+                color="text.secondary"
               >
-
-                {/* CAR IMAGE */}
-
-                <Box
-                  component="img"
-                  src={car.image}
-                  alt={car.name}
+                No electric cars available.
+              </Typography>
+            </Box>
+          ) : (
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                  xs: "minmax(0, 1fr)",
+                  sm: "repeat(2, minmax(0, 1fr))",
+                  md: "repeat(3, minmax(0, 1fr))",
+                  lg: "repeat(5, minmax(0, 1fr))"
+                },
+                gap: 2.5,
+                alignItems: "stretch",
+                minWidth: 0
+              }}
+            >
+              {featuredCars.map((car) => (
+                <Card
+                  key={car.id}
                   sx={{
-                    width: "100%",
-                    maxWidth: "100%",
-                    height: 115,
-                    objectFit: "contain",
-                    display: "block",
-                    flexShrink: 0
-                  }}
-                />
-
-                {/* CAR INFORMATION */}
-
-                <CardContent
-                  sx={{
-                    px: 1,
-                    pb: 1,
-                    pt: 2,
-
-                    flex: 1,
+                    height: "100%",
                     minWidth: 0,
-
+                    minHeight: 310,
+                    borderRadius: 3,
+                    boxShadow: "none",
+                    backgroundColor: "background.paper",
+                    p: 1.5,
+                    boxSizing: "border-box",
                     display: "flex",
                     flexDirection: "column",
-
-                    "&:last-child": {
-                      pb: 1
+                    transition: "0.3s",
+                    "&:hover": {
+                      transform: "translateY(-4px)",
+                      boxShadow: isDark
+                        ? "0 8px 24px rgba(0,0,0,0.35)"
+                        : "0 8px 24px rgba(0,0,0,0.08)"
                     }
                   }}
                 >
-
-                  {/* CAR NAME */}
-
-                  <Typography
-                    sx={{
-                      fontWeight: 800,
-                      color: "#092b40",
-                      mb: 1.5,
-                      minHeight: 44,
-                      fontSize: 15,
-                      overflowWrap: "break-word"
-                    }}
-                  >
-                    {car.name}
-                  </Typography>
-
-                  {/* DRIVING RANGE */}
-
                   <Box
+                    component="img"
+                    src={car.image}
+                    alt={car.name}
                     sx={{
+                      width: "100%",
+                      maxWidth: "100%",
+                      height: 115,
+                      objectFit: "contain",
+                      display: "block",
+                      flexShrink: 0
+                    }}
+                  />
+
+                  <CardContent
+                    sx={{
+                      px: 1,
+                      pb: 1,
+                      pt: 2,
+                      flex: 1,
+                      minWidth: 0,
                       display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                      mb: 0.7,
-                      minWidth: 0
+                      flexDirection: "column",
+                      "&:last-child": {
+                        pb: 1
+                      }
                     }}
                   >
-                    <BatteryChargingFull
-                      sx={{
-                        color: "#10b981",
-                        fontSize: 19,
-                        flexShrink: 0
-                      }}
-                    />
-
                     <Typography
                       sx={{
-                        fontSize: 12,
-                        color: "#164b91",
+                        fontWeight: 800,
+                        color: "text.primary",
+                        mb: 1.5,
+                        minHeight: 44,
+                        fontSize: 15,
                         overflowWrap: "break-word"
                       }}
                     >
-                      Range: {car.range}
+                      {car.name}
                     </Typography>
-                  </Box>
 
-                  {/* CHARGING TIME */}
-
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                      mb: 2,
-                      minWidth: 0
-                    }}
-                  >
-                    <Bolt
+                    <Box
                       sx={{
-                        color: "#10b981",
-                        fontSize: 19,
-                        flexShrink: 0
-                      }}
-                    />
-
-                    <Typography
-                      sx={{
-                        fontSize: 12,
-                        color: "#164b91",
-                        overflowWrap: "anywhere"
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        mb: 0.7,
+                        minWidth: 0
                       }}
                     >
-                      Charging Time: {car.charging}
-                    </Typography>
-                  </Box>
+                      <BatteryChargingFull
+                        sx={{
+                          color: "#10b981",
+                          fontSize: 19,
+                          flexShrink: 0
+                        }}
+                      />
 
-                  {/* VIEW DETAILS BUTTON */}
+                      <Typography
+                        sx={{
+                          fontSize: 12,
+                          color: "text.secondary",
+                          overflowWrap: "break-word"
+                        }}
+                      >
+                        Range: {car.range}
+                      </Typography>
+                    </Box>
 
-                  <Box sx={{ mt: "auto" }}>
-                    <Button
-                      variant="outlined"
-                      fullWidth
-                      onClick={() =>
-                        navigate(`/car-details/${car.brand}`)
-                      }
+                    <Box
                       sx={{
-                        borderColor: "#10c997",
-                        color: "#10b981",
-                        borderRadius: 3,
-                        fontWeight: 700,
-                        fontSize: 12,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        mb: 2,
+                        minWidth: 0
+                      }}
+                    >
+                      <Bolt
+                        sx={{
+                          color: "#10b981",
+                          fontSize: 19,
+                          flexShrink: 0
+                        }}
+                      />
 
-                        "&:hover": {
-                          backgroundColor: "#e8fff7",
-                          borderColor: "#10b981"
+                      <Typography
+                        sx={{
+                          fontSize: 12,
+                          color: "text.secondary",
+                          overflowWrap: "anywhere"
+                        }}
+                      >
+                        Charging Time: {car.charging}
+                      </Typography>
+                    </Box>
+
+                    <Box sx={{ mt: "auto" }}>
+                      <Button
+                        variant="outlined"
+                        fullWidth
+                        onClick={() =>
+                          navigate(
+                            `/car-details/${encodeURIComponent(car.brand)}`
+                          )
                         }
-                      }}
-                    >
-                      View Details →
-                    </Button>
-                  </Box>
-
-                </CardContent>
-              </Card>
-            ))}
-          </Box>
-
+                        sx={{
+                          borderColor: "#10c997",
+                          color: "#10b981",
+                          borderRadius: 3,
+                          fontWeight: 700,
+                          fontSize: 12,
+                          "&:hover": {
+                            backgroundColor: isDark
+                              ? "#123f34"
+                              : "#e8fff7",
+                            borderColor: "#10b981"
+                          }
+                        }}
+                      >
+                        View Details →
+                      </Button>
+                    </Box>
+                  </CardContent>
+                </Card>
+              ))}
+            </Box>
+          )}
         </Container>
       </Box>
-
     </Box>
   );
 }

@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -21,167 +22,7 @@ import {
   Speed
 } from "@mui/icons-material";
 
-// ========================================
-// AC CHARGERS
-// ========================================
-
-const acChargers = [
-  {
-    name: "AC Charger 12A Fixed",
-    type: "AC",
-    current: "12A",
-    power: "2.76 kW",
-    voltage: "230V",
-    phase: "Single Phase",
-    description:
-      "A fixed 12A AC charger suitable for compatible home charging installations.",
-    features: [
-      "Fixed 12A current",
-      "Single-phase charging",
-      "Overnight charging",
-      "Easy operation"
-    ]
-  },
-  {
-    name: "AC Charger 16A Fixed",
-    type: "AC",
-    current: "16A",
-    power: "3.68 kW",
-    voltage: "230V",
-    phase: "Single Phase",
-    description:
-      "A fixed 16A AC charger designed for reliable everyday charging.",
-    features: [
-      "Fixed 16A current",
-      "Home charging",
-      "Single-phase charging",
-      "Dedicated rated circuit"
-    ]
-  },
-  {
-    name: "AC Adjustable Charger",
-    type: "AC",
-    current: "6A–16A",
-    power: "1.38–3.68 kW",
-    voltage: "230V",
-    phase: "Single Phase",
-    description:
-      "An adjustable AC charger allowing flexible charging current settings.",
-    features: [
-      "Adjustable current",
-      "Flexible charging",
-      "Multiple settings",
-      "Home charging"
-    ]
-  },
-  {
-    name: "AC Wallbox 32A",
-    type: "AC",
-    current: "32A",
-    power: "7.36 kW",
-    voltage: "230V",
-    phase: "Single Phase",
-    description:
-      "A wall-mounted AC charger for residential and workplace charging.",
-    features: [
-      "32A charging",
-      "Wall-mounted design",
-      "Home and workplace",
-      "Dedicated circuit"
-    ]
-  },
-  {
-    name: "AC Three Phase 22kW",
-    type: "AC",
-    current: "32A",
-    power: "22 kW",
-    voltage: "400V",
-    phase: "Three Phase",
-    description:
-      "A high-power AC charger for compatible electric vehicles.",
-    features: [
-      "Three-phase charging",
-      "22kW output",
-      "Commercial charging",
-      "High charging capacity"
-    ]
-  }
-];
-
-// ========================================
-// DC CHARGERS
-// ========================================
-
-const dcChargers = [
-  {
-    name: "DC Fast Charger 30kW",
-    type: "DC",
-    current: "Vehicle dependent",
-    power: "30 kW",
-    voltage: "Vehicle dependent",
-    phase: "DC Output",
-    description:
-      "A DC fast charger suitable for compatible public and commercial charging locations.",
-    features: [
-      "30kW output",
-      "Direct DC charging",
-      "Commercial use",
-      "Compatible EVs"
-    ]
-  },
-  {
-    name: "DC Fast Charger 60kW",
-    type: "DC",
-    current: "Vehicle dependent",
-    power: "60 kW",
-    voltage: "Vehicle dependent",
-    phase: "DC Output",
-    description:
-      "A 60kW DC charger designed for faster public electric vehicle charging.",
-    features: [
-      "60kW output",
-      "Public charging",
-      "Direct DC charging",
-      "Charging stations"
-    ]
-  },
-  {
-    name: "DC Rapid Charger 120kW",
-    type: "DC",
-    current: "Vehicle dependent",
-    power: "120 kW",
-    voltage: "Vehicle dependent",
-    phase: "DC Output",
-    description:
-      "A rapid DC charger designed for highway and commercial charging stations.",
-    features: [
-      "120kW output",
-      "Rapid charging",
-      "Highway stations",
-      "High-power technology"
-    ]
-  },
-  {
-    name: "DC Ultra-Fast 180kW",
-    type: "DC",
-    current: "Vehicle dependent",
-    power: "180 kW",
-    voltage: "Vehicle dependent",
-    phase: "DC Output",
-    description:
-      "An ultra-fast DC charger for vehicles supporting high-power charging.",
-    features: [
-      "180kW output",
-      "Ultra-fast charging",
-      "Commercial stations",
-      "High-power technology"
-    ]
-  }
-];
-
-// ========================================
-// CHARGER CARD COMPONENT
-// ========================================
+import { ChargersContext } from "../Context/ChargersContext";
 
 function ChargerCard({ charger }) {
   const isAC = charger.type === "AC";
@@ -189,25 +30,29 @@ function ChargerCard({ charger }) {
   const specs = [
     {
       label: "Power",
-      value: charger.power,
+      value: charger.power || "Not available",
       icon: <Bolt sx={{ fontSize: 18 }} />
     },
     {
       label: "Current",
-      value: charger.current,
+      value: charger.current || "Not available",
       icon: <BatteryChargingFull sx={{ fontSize: 18 }} />
     },
     {
       label: "Voltage",
-      value: charger.voltage,
+      value: charger.voltage || "Not available",
       icon: <Speed sx={{ fontSize: 18 }} />
     },
     {
       label: "Connection",
-      value: charger.phase,
+      value: charger.phase || "Not available",
       icon: <ElectricBolt sx={{ fontSize: 18 }} />
     }
   ];
+
+  const features = Array.isArray(charger.features)
+    ? charger.features
+    : [];
 
   return (
     <Card
@@ -218,16 +63,19 @@ function ChargerCard({ charger }) {
         minWidth: 0,
         boxSizing: "border-box",
         borderRadius: 3,
-        backgroundColor: "#ffffff",
-        border: "1px solid #e2edf5",
+        bgcolor: "background.paper",
+        border: "1px solid",
+        borderColor: "divider",
         overflow: "hidden",
         display: "flex",
         flexDirection: "column",
         transition: "transform 0.2s, box-shadow 0.2s",
-
         "&:hover": {
           transform: "translateY(-4px)",
-          boxShadow: "0 8px 24px rgba(0,0,0,0.08)"
+          boxShadow: (theme) =>
+            theme.palette.mode === "dark"
+              ? "0 8px 24px rgba(0,0,0,0.35)"
+              : "0 8px 24px rgba(0,0,0,0.08)"
         }
       }}
     >
@@ -239,13 +87,18 @@ function ChargerCard({ charger }) {
           flexGrow: 1
         }}
       >
-        {/* CHARGER ICON */}
-
         <Box
           sx={{
             height: 100,
             borderRadius: 2,
-            backgroundColor: isAC ? "#effaf5" : "#eff7ff",
+            backgroundColor: (theme) =>
+              theme.palette.mode === "dark"
+                ? isAC
+                  ? "rgba(16,185,129,0.12)"
+                  : "rgba(22,140,240,0.12)"
+                : isAC
+                ? "#effaf5"
+                : "#eff7ff",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -269,8 +122,6 @@ function ChargerCard({ charger }) {
           )}
         </Box>
 
-        {/* TYPE */}
-
         <Chip
           label={`${charger.type} CHARGER`}
           size="small"
@@ -279,20 +130,21 @@ function ChargerCard({ charger }) {
             mb: 1.5,
             fontWeight: 700,
             fontSize: 11,
-            backgroundColor: isAC
-              ? "#e8fff7"
-              : "#e8f3ff",
-            color: isAC
-              ? "#10b981"
-              : "#168cf0"
+            backgroundColor: (theme) =>
+              theme.palette.mode === "dark"
+                ? isAC
+                  ? "rgba(16,185,129,0.15)"
+                  : "rgba(22,140,240,0.15)"
+                : isAC
+                ? "#e8fff7"
+                : "#e8f3ff",
+            color: isAC ? "#10b981" : "#168cf0"
           }}
         />
 
-        {/* NAME */}
-
         <Typography
           sx={{
-            color: "#092b40",
+            color: "text.primary",
             fontWeight: 800,
             fontSize: 15,
             lineHeight: 1.4,
@@ -303,23 +155,19 @@ function ChargerCard({ charger }) {
           {charger.name}
         </Typography>
 
-        {/* DESCRIPTION */}
-
         <Typography
           sx={{
             fontSize: 12,
-            color: "#64748b",
+            color: "text.secondary",
             lineHeight: 1.6,
             minHeight: 78,
             mb: 1.5
           }}
         >
-          {charger.description}
+          {charger.description || "No description available."}
         </Typography>
 
         <Divider sx={{ mb: 2 }} />
-
-        {/* SPECIFICATIONS */}
 
         <Box
           sx={{
@@ -350,7 +198,10 @@ function ChargerCard({ charger }) {
 
               <Typography
                 sx={{
-                  color: "#164b91",
+                  color: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "text.secondary"
+                      : "#164b91",
                   fontSize: 12,
                   lineHeight: 1.5,
                   overflowWrap: "anywhere"
@@ -368,8 +219,6 @@ function ChargerCard({ charger }) {
           ))}
         </Box>
 
-        {/* MAIN FEATURES */}
-
         <Box sx={{ mt: "auto" }}>
           <Divider sx={{ mb: 1.5 }} />
 
@@ -377,7 +226,7 @@ function ChargerCard({ charger }) {
             sx={{
               fontSize: 13,
               fontWeight: 800,
-              color: "#092b40",
+              color: "text.primary",
               mb: 1.5
             }}
           >
@@ -391,35 +240,49 @@ function ChargerCard({ charger }) {
               gap: 1
             }}
           >
-            {charger.features.map((feature) => (
-              <Box
-                key={feature}
-                sx={{
-                  display: "flex",
-                  alignItems: "flex-start",
-                  gap: 1
-                }}
-              >
-                <CheckCircle
+            {features.length > 0 ? (
+              features.map((feature, index) => (
+                <Box
+                  key={`${feature}-${index}`}
                   sx={{
-                    color: "#10b981",
-                    fontSize: 16,
-                    flexShrink: 0,
-                    mt: "2px"
-                  }}
-                />
-
-                <Typography
-                  sx={{
-                    fontSize: 12,
-                    color: "#164b91",
-                    lineHeight: 1.5
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: 1
                   }}
                 >
-                  {feature}
-                </Typography>
-              </Box>
-            ))}
+                  <CheckCircle
+                    sx={{
+                      color: "#10b981",
+                      fontSize: 16,
+                      flexShrink: 0,
+                      mt: "2px"
+                    }}
+                  />
+
+                  <Typography
+                    sx={{
+                      fontSize: 12,
+                      color: (theme) =>
+                        theme.palette.mode === "dark"
+                          ? "text.secondary"
+                          : "#164b91",
+                      lineHeight: 1.5
+                    }}
+                  >
+                    {feature}
+                  </Typography>
+                </Box>
+              ))
+            ) : (
+              <Typography
+                sx={{
+                  fontSize: 12,
+                  color: "text.secondary"
+                }}
+              >
+                No features available.
+              </Typography>
+            )}
           </Box>
         </Box>
       </Box>
@@ -427,51 +290,39 @@ function ChargerCard({ charger }) {
   );
 }
 
-// ========================================
-// MAIN CHARGERS PAGE
-// ========================================
-
 export default function Chargers() {
   const navigate = useNavigate();
-
-  // Show AC chargers by default
   const [selectedType, setSelectedType] = useState("AC");
 
-  const allChargers = [
-    ...acChargers,
-    ...dcChargers
-  ];
+  const { chargers } = useContext(ChargersContext);
 
-  // Filter chargers based on AC or DC selection
-  const filteredChargers = allChargers.filter(
+  const filteredChargers = chargers.filter(
     (charger) => charger.type === selectedType
   );
 
   return (
     <Box
       sx={{
-        backgroundColor: "#eff7fd",
+        backgroundColor: (theme) =>
+          theme.palette.mode === "dark"
+            ? theme.palette.background.default
+            : "#eff7fd",
         minHeight: "100vh",
         py: 5
       }}
     >
       <Container maxWidth="xl">
-
-        {/* BACK BUTTON */}
-
         <Button
           startIcon={<ArrowBack />}
           onClick={() => navigate(-1)}
           sx={{
             mb: 3,
-            color: "#092b40",
+            color: "text.primary",
             fontWeight: 700
           }}
         >
           Back
         </Button>
-
-        {/* PAGE TITLE */}
 
         <Typography
           sx={{
@@ -488,7 +339,7 @@ export default function Chargers() {
           variant="h4"
           sx={{
             fontWeight: 800,
-            color: "#092b40",
+            color: "text.primary",
             mb: 2
           }}
         >
@@ -497,7 +348,10 @@ export default function Chargers() {
 
         <Typography
           sx={{
-            color: "#164b91",
+            color: (theme) =>
+              theme.palette.mode === "dark"
+                ? "text.secondary"
+                : "#164b91",
             fontSize: 14,
             lineHeight: 1.8,
             mb: 4,
@@ -508,8 +362,6 @@ export default function Chargers() {
           solutions. Compare charging power, current,
           voltage and important features.
         </Typography>
-
-        {/* FILTER BUTTONS - AC AND DC ONLY */}
 
         <Box
           sx={{
@@ -533,22 +385,20 @@ export default function Chargers() {
                   py: 1,
                   fontWeight: 700,
                   fontSize: 12,
-
                   backgroundColor: active
                     ? "#10b981"
                     : "transparent",
-
                   color: active
                     ? "#ffffff"
                     : "#10b981",
-
                   borderColor: "#10b981",
-
                   "&:hover": {
-                    backgroundColor: active
-                      ? "#059669"
-                      : "#e8fff7",
-
+                    backgroundColor: (theme) =>
+                      active
+                        ? "#059669"
+                        : theme.palette.mode === "dark"
+                        ? "rgba(16,185,129,0.14)"
+                        : "#e8fff7",
                     borderColor: "#10b981"
                   }
                 }}
@@ -559,110 +409,185 @@ export default function Chargers() {
           })}
         </Box>
 
-        {/* CHARGERS GRID */}
-
-        <Box
-          sx={{
-            display: "grid",
-
-            gridTemplateColumns: {
-              xs: "repeat(1, minmax(0, 1fr))",
-              sm: "repeat(2, minmax(0, 1fr))",
-              md: "repeat(3, minmax(0, 1fr))",
-              lg: "repeat(5, minmax(0, 1fr))"
-            },
-
-            columnGap: {
-              xs: 2,
-              md: 3
-            },
-
-            rowGap: {
-              xs: 3,
-              md: 4
-            },
-
-            alignItems: "stretch"
-          }}
-        >
-          {filteredChargers.map((charger) => (
-            <ChargerCard
-              key={charger.name}
-              charger={charger}
-            />
-          ))}
-        </Box>
-
-        {/* AC VS DC INFORMATION */}
+        {filteredChargers.length === 0 ? (
+          <Box
+            sx={{
+              textAlign: "center",
+              py: 7
+            }}
+          >
+            <Typography
+              variant="h6"
+              color="text.secondary"
+            >
+              No {selectedType} chargers available.
+            </Typography>
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "repeat(1, minmax(0, 1fr))",
+                sm: "repeat(2, minmax(0, 1fr))",
+                md: "repeat(3, minmax(0, 1fr))",
+                lg: "repeat(5, minmax(0, 1fr))"
+              },
+              columnGap: {
+                xs: 2,
+                md: 3
+              },
+              rowGap: {
+                xs: 3,
+                md: 4
+              },
+              alignItems: "stretch"
+            }}
+          >
+            {filteredChargers.map((charger) => (
+              <ChargerCard
+                key={charger.id}
+                charger={charger}
+              />
+            ))}
+          </Box>
+        )}
 
         <Box
           sx={{
             mt: 6,
             p: { xs: 3, md: 4 },
-            backgroundColor: "white",
+            bgcolor: "background.paper",
             borderRadius: 4
           }}
         >
-          <Typography
-            variant="h5"
-            sx={{
-              color: "#092b40",
-              fontWeight: 800,
-              mb: 2
-            }}
-          >
-            AC vs DC Charging
-          </Typography>
+          {selectedType === "AC" ? (
+            <>
+              <Typography
+                variant="h5"
+                sx={{
+                  color: "text.primary",
+                  fontWeight: 800,
+                  mb: 2
+                }}
+              >
+                AC Charging Details
+              </Typography>
+
+              <Typography
+                sx={{
+                  color: "text.secondary",
+                  lineHeight: 1.9,
+                  fontSize: 14
+                }}
+              >
+                AC charging supplies alternating current
+                to the vehicle. The vehicle's onboard
+                charger converts AC electricity into DC
+                power to charge the battery.
+              </Typography>
+
+              <Divider sx={{ my: 3 }} />
+
+              <Typography
+                sx={{
+                  color: "text.secondary",
+                  lineHeight: 1.9,
+                  fontSize: 14
+                }}
+              >
+                AC charging is commonly used at homes,
+                workplaces and parking locations. It is
+                suitable for everyday and overnight
+                charging.
+              </Typography>
+
+              <Typography
+                sx={{
+                  color: "text.secondary",
+                  lineHeight: 1.9,
+                  fontSize: 14,
+                  mt: 2
+                }}
+              >
+                AC chargers include fixed 12A and 16A
+                models, adjustable portable chargers,
+                wallboxes and three-phase charging
+                systems.
+              </Typography>
+            </>
+          ) : (
+            <>
+              <Typography
+                variant="h5"
+                sx={{
+                  color: "text.primary",
+                  fontWeight: 800,
+                  mb: 2
+                }}
+              >
+                DC Charging Details
+              </Typography>
+
+              <Typography
+                sx={{
+                  color: "text.secondary",
+                  lineHeight: 1.9,
+                  fontSize: 14
+                }}
+              >
+                DC charging converts AC electricity
+                into DC outside the vehicle and
+                delivers DC power to the battery
+                through compatible charging hardware.
+              </Typography>
+
+              <Divider sx={{ my: 3 }} />
+
+              <Typography
+                sx={{
+                  color: "text.secondary",
+                  lineHeight: 1.9,
+                  fontSize: 14
+                }}
+              >
+                DC chargers are commonly used at public
+                charging stations, commercial locations
+                and highway service areas where faster
+                charging is required.
+              </Typography>
+
+              <Typography
+                sx={{
+                  color: "text.secondary",
+                  lineHeight: 1.9,
+                  fontSize: 14,
+                  mt: 2
+                }}
+              >
+                DC charging equipment includes 30 kW,
+                60 kW, 120 kW and 180 kW chargers.
+                Actual charging speed depends on the
+                vehicle and battery conditions.
+              </Typography>
+            </>
+          )}
 
           <Typography
             sx={{
-              color: "#164b91",
-              lineHeight: 1.9,
-              fontSize: 14
-            }}
-          >
-            AC charging supplies alternating current
-            to the vehicle. The vehicle's onboard charger
-            converts AC electricity into DC power to
-            charge the battery.
-
-            AC charging is commonly used at homes,
-            workplaces and parking locations.
-          </Typography>
-
-          <Divider sx={{ my: 3 }} />
-
-          <Typography
-            sx={{
-              color: "#164b91",
-              lineHeight: 1.9,
-              fontSize: 14
-            }}
-          >
-            DC charging converts AC electricity into
-            DC outside the vehicle and delivers DC power
-            through compatible charging hardware.
-
-            DC chargers are commonly used at public
-            charging stations and highway service areas
-            where faster charging is required.
-          </Typography>
-
-          <Typography
-            sx={{
-              color: "#64748b",
+              color: "text.secondary",
               fontSize: 12,
               mt: 3,
               lineHeight: 1.8
             }}
           >
-            Note: Actual charging power depends on vehicle
-            compatibility, battery conditions and electrical
-            infrastructure. Electrical installations must
-            meet the charger's safety and current requirements.
+            Note: Actual charging power depends on
+            vehicle compatibility, battery conditions
+            and electrical infrastructure. Electrical
+            installations must meet the charger's
+            safety and current requirements.
           </Typography>
         </Box>
-
       </Container>
     </Box>
   );

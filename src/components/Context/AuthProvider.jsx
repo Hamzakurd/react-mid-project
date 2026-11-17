@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { AuthContext } from "./AuthContext";
@@ -23,15 +24,16 @@ export const AuthProvider = ({ children }) => {
 
   const getAllUsers = () => {
     const savedUsers = readStorage("users", []);
+
     const updatedUsers = Array.isArray(savedUsers)
       ? savedUsers
       : [];
 
     setUsers(updatedUsers);
+
     return updatedUsers;
   };
 
-  // REGISTER
   const register = async (data) => {
     try {
       const name = data.name?.trim();
@@ -59,7 +61,8 @@ export const AuthProvider = ({ children }) => {
       const existingUsers = getAllUsers();
 
       const isExist = existingUsers.some(
-        (user) => user.email?.toLowerCase() === email
+        (user) =>
+          user.email?.toLowerCase() === email
       );
 
       if (isExist) {
@@ -90,9 +93,16 @@ export const AuthProvider = ({ children }) => {
         role: "user"
       };
 
-      const updatedUsers = [...existingUsers, newUser];
+      const updatedUsers = [
+        ...existingUsers,
+        newUser
+      ];
 
-      localStorage.setItem("users", JSON.stringify(updatedUsers));
+      localStorage.setItem(
+        "users",
+        JSON.stringify(updatedUsers)
+      );
+
       setUsers(updatedUsers);
 
       toast.success("Registered Successfully!");
@@ -104,7 +114,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // LOGIN
   const login = async (email, password) => {
     try {
       if (!email?.trim() || !password) {
@@ -124,7 +133,8 @@ export const AuthProvider = ({ children }) => {
       const existingUsers = getAllUsers();
 
       const foundUser = existingUsers.find(
-        (user) => user.email?.toLowerCase() === normalizedEmail
+        (user) =>
+          user.email?.toLowerCase() === normalizedEmail
       );
 
       if (!foundUser) {
@@ -153,7 +163,96 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // LOGOUT
+  const updateProfile = async (data) => {
+    try {
+      if (!currentUser) {
+        toast.error("Please login first!");
+        return false;
+      }
+
+      const name = String(data.name || "").trim();
+      const email = String(data.email || "")
+        .trim()
+        .toLowerCase();
+
+      if (!name || !email) {
+        toast.error("Name and email are required!");
+        return false;
+      }
+
+      if (name.length < 3) {
+        toast.error("Name must be at least 3 characters!");
+        return false;
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!emailRegex.test(email)) {
+        toast.error("Please enter a valid email!");
+        return false;
+      }
+
+      const existingUsers = getAllUsers();
+
+      const userIndex = existingUsers.findIndex(
+        (user) =>
+          String(user.id) === String(currentUser.id)
+      );
+
+      if (userIndex === -1) {
+        toast.error("User account not found!");
+        return false;
+      }
+
+      const emailExists = existingUsers.some(
+        (user) =>
+          String(user.id) !== String(currentUser.id) &&
+          user.email?.toLowerCase() === email
+      );
+
+      if (emailExists) {
+        toast.error("This email is already in use!");
+        return false;
+      }
+
+      const savedUser = existingUsers[userIndex];
+
+      const updatedUser = {
+        ...savedUser,
+        name,
+        email
+      };
+
+      const updatedUsers = existingUsers.map(
+        (user) =>
+          String(user.id) === String(currentUser.id)
+            ? updatedUser
+            : user
+      );
+
+      localStorage.setItem(
+        "users",
+        JSON.stringify(updatedUsers)
+      );
+
+      localStorage.setItem(
+        "currentUser",
+        JSON.stringify(updatedUser)
+      );
+
+      setUsers(updatedUsers);
+      setCurrentUser(updatedUser);
+
+      toast.success("Profile updated successfully!");
+
+      return true;
+    } catch (error) {
+      console.error("Update profile error:", error);
+      toast.error("Failed to update profile!");
+      return false;
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem("currentUser");
     setCurrentUser(null);
@@ -170,7 +269,8 @@ export const AuthProvider = ({ children }) => {
         register,
         login,
         logout,
-        getAllUsers
+        getAllUsers,
+        updateProfile
       }}
     >
       {children}

@@ -12,16 +12,13 @@ import {
   Bolt,
   DirectionsCar,
   ArrowForward,
+  ArrowBack,
   CheckCircle
 } from "@mui/icons-material";
 
 import EnergySavingsLeafIcon from "@mui/icons-material/EnergySavingsLeaf";
 
 import { useNavigate } from "react-router-dom";
-
-// ========================================
-// FEATURES
-// ========================================
 
 const features = [
   {
@@ -44,10 +41,6 @@ const features = [
   }
 ];
 
-// ========================================
-// BENEFITS
-// ========================================
-
 const benefits = [
   "Discover electric vehicle technologies",
   "Compare different electric car models",
@@ -55,24 +48,37 @@ const benefits = [
   "Explore modern and sustainable transportation"
 ];
 
-// ========================================
-// ABOUT PAGE
-// ========================================
-
 export default function About() {
   const navigate = useNavigate();
 
   return (
     <Box
       sx={{
-        backgroundColor: "#eff7fd",
+        backgroundColor: (theme) => theme.palette.mode === "dark" ? "background.default" : "#eff7fd",
+        color: "text.primary",
         minHeight: "100vh",
         py: { xs: 5, md: 8 }
       }}
     >
       <Container maxWidth="lg">
+        <Button
+          startIcon={<ArrowBack />}
+          onClick={() => navigate("/")}
+          sx={{
+            mb: 3,
+            color: "text.primary",
+            fontWeight: 700,
+            textTransform: "none",
+            "&:hover": {
+              color: "#10b981",
+              backgroundColor: "transparent"
+            }
+          }}
+        >
+          Back to Home
+        </Button>
 
-        {/* ABOUT INTRODUCTION */}
+        
 
         <Box
           sx={{
@@ -95,7 +101,7 @@ export default function About() {
           <Typography
             variant="h3"
             sx={{
-              color: "#092b40",
+              color: "text.primary",
               fontWeight: 800,
               fontSize: { xs: 32, md: 46 },
               mb: 3
@@ -106,7 +112,7 @@ export default function About() {
 
           <Typography
             sx={{
-              color: "#164b91",
+              color: (theme) => theme.palette.mode === "dark" ? "text.secondary" : "#164b91",
               fontSize: { xs: 15, md: 17 },
               lineHeight: 1.9,
               maxWidth: 800,
@@ -121,16 +127,14 @@ export default function About() {
           </Typography>
         </Box>
 
-        {/* ========================================
-            OUR MISSION
-        ======================================== */}
+        
 
         <Paper
           elevation={0}
           sx={{
             p: { xs: 3, md: 5 },
             borderRadius: 4,
-            backgroundColor: "white",
+            backgroundColor: "background.paper",
             mb: 7
           }}
         >
@@ -148,11 +152,11 @@ export default function About() {
             }}
           >
 
-            {/* MISSION ICON */}
+            
 
             <Box
               sx={{
-                backgroundColor: "#e8fff7",
+                backgroundColor: (theme) => theme.palette.mode === "dark" ? "rgba(16,185,129,0.14)" : "#e8fff7",
                 borderRadius: 4,
                 height: 280,
                 display: "flex",
@@ -168,7 +172,7 @@ export default function About() {
               />
             </Box>
 
-            {/* MISSION INFORMATION */}
+            
 
             <Box>
               <Typography
@@ -184,7 +188,7 @@ export default function About() {
               <Typography
                 variant="h4"
                 sx={{
-                  color: "#092b40",
+                  color: "text.primary",
                   fontWeight: 800,
                   mb: 3
                 }}
@@ -194,7 +198,7 @@ export default function About() {
 
               <Typography
                 sx={{
-                  color: "#164b91",
+                  color: (theme) => theme.palette.mode === "dark" ? "text.secondary" : "#164b91",
                   lineHeight: 1.9,
                   mb: 3
                 }}
@@ -207,7 +211,7 @@ export default function About() {
 
               <Typography
                 sx={{
-                  color: "#164b91",
+                  color: (theme) => theme.palette.mode === "dark" ? "text.secondary" : "#164b91",
                   lineHeight: 1.9
                 }}
               >
@@ -220,9 +224,7 @@ export default function About() {
           </Box>
         </Paper>
 
-        {/* ========================================
-            OUR FEATURES
-        ======================================== */}
+        
 
         <Box sx={{ mb: 7 }}>
 
@@ -240,7 +242,7 @@ export default function About() {
           <Typography
             variant="h4"
             sx={{
-              color: "#092b40",
+              color: "text.primary",
               fontWeight: 800,
               textAlign: "center",
               mb: 4
@@ -249,7 +251,7 @@ export default function About() {
             Explore Our Features
           </Typography>
 
-          {/* FEATURES CARDS */}
+          
 
           <Box
             sx={{
@@ -273,8 +275,9 @@ export default function About() {
                 sx={{
                   p: 4,
                   borderRadius: 4,
-                  backgroundColor: "white",
-                  border: "1px solid #e2edf5",
+                  backgroundColor: "background.paper",
+                  border: "1px solid",
+                  borderColor: "divider",
 
                   height: "100%",
                   boxSizing: "border-box",
@@ -289,13 +292,13 @@ export default function About() {
                 }}
               >
 
-                {/* FEATURE ICON */}
+                
 
                 <Box
                   sx={{
                     width: 75,
                     height: 75,
-                    backgroundColor: "#e8fff7",
+                    backgroundColor: (theme) => theme.palette.mode === "dark" ? "rgba(16,185,129,0.14)" : "#e8fff7",
                     color: "#10b981",
                     borderRadius: 3,
 
@@ -309,12 +312,12 @@ export default function About() {
                   {feature.icon}
                 </Box>
 
-                {/* FEATURE TITLE */}
+                
 
                 <Typography
                   variant="h6"
                   sx={{
-                    color: "#092b40",
+                    color: "text.primary",
                     fontWeight: 800,
                     mb: 2
                   }}
@@ -322,11 +325,11 @@ export default function About() {
                   {feature.title}
                 </Typography>
 
-                {/* FEATURE DESCRIPTION */}
+                
 
                 <Typography
                   sx={{
-                    color: "#164b91",
+                    color: (theme) => theme.palette.mode === "dark" ? "text.secondary" : "#164b91",
                     fontSize: 14,
                     lineHeight: 1.8
                   }}
@@ -341,16 +344,14 @@ export default function About() {
 
         </Box>
 
-        {/* ========================================
-            WHY EV WISE
-        ======================================== */}
+        
 
         <Paper
           elevation={0}
           sx={{
             p: { xs: 3, md: 5 },
             borderRadius: 4,
-            backgroundColor: "white",
+            backgroundColor: "background.paper",
             mb: 7
           }}
         >
@@ -369,7 +370,7 @@ export default function About() {
             }}
           >
 
-            {/* BENEFITS INFORMATION */}
+            
 
             <Box>
               <Typography
@@ -385,7 +386,7 @@ export default function About() {
               <Typography
                 variant="h4"
                 sx={{
-                  color: "#092b40",
+                  color: "text.primary",
                   fontWeight: 800,
                   mb: 3
                 }}
@@ -414,7 +415,7 @@ export default function About() {
 
                   <Typography
                     sx={{
-                      color: "#164b91",
+                      color: (theme) => theme.palette.mode === "dark" ? "text.secondary" : "#164b91",
                       fontSize: 15
                     }}
                   >
@@ -426,11 +427,11 @@ export default function About() {
               ))}
             </Box>
 
-            {/* CAR ICON */}
+            
 
             <Box
               sx={{
-                backgroundColor: "#eff7fd",
+                backgroundColor: (theme) => theme.palette.mode === "dark" ? "rgba(16,185,129,0.10)" : "#eff7fd",
                 borderRadius: 4,
                 height: 280,
 
@@ -451,9 +452,7 @@ export default function About() {
 
         </Paper>
 
-        {/* ========================================
-            CALL TO ACTION
-        ======================================== */}
+        
 
         <Box
           sx={{

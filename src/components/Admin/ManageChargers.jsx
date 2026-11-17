@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useContext } from "react";
 import toast from "react-hot-toast";
 
 import {
@@ -29,55 +30,30 @@ import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-const STORAGE_KEY = "evWiseAdminChargers";
-
-const initialChargers = [
-  { id: "1", name: "Portable AC Charger", type: "AC", power: "2.8 kW" },
-  { id: "2", name: "Home AC Charger", type: "AC", power: "3.7 kW" },
-  { id: "3", name: "Wallbox AC Charger", type: "AC", power: "7.4 kW" },
-  { id: "4", name: "Fast DC Charger", type: "DC", power: "30 kW" },
-  { id: "5", name: "Rapid DC Charger", type: "DC", power: "60 kW" },
-  { id: "6", name: "Ultra-Fast DC Charger", type: "DC", power: "120 kW" },
-  { id: "7", name: "High-Power DC Charger", type: "DC", power: "180 kW" }
-];
+import { ChargersContext } from "../Context/ChargersContext";
 
 const emptyCharger = {
   name: "",
   type: "AC",
-  power: ""
-};
-
-const loadChargers = () => {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-
-    if (saved === null) {
-      return initialChargers;
-    }
-
-    const parsed = JSON.parse(saved);
-    return Array.isArray(parsed) ? parsed : initialChargers;
-  } catch {
-    return initialChargers;
-  }
+  power: "",
+  current: "",
+  voltage: "",
+  phase: "",
+  description: "",
+  features: ""
 };
 
 export default function ManageChargers() {
-  const [chargers, setChargers] = useState(loadChargers);
+  const {
+    chargers,
+    addCharger,
+    updateCharger,
+    deleteCharger
+  } = useContext(ChargersContext);
+
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState(emptyCharger);
-
-  const saveChargers = (updated) => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-      setChargers(updated);
-      return true;
-    } catch {
-      toast.error("Failed to save chargers!");
-      return false;
-    }
-  };
 
   const handleAdd = () => {
     setEditingId(null);
@@ -87,11 +63,20 @@ export default function ManageChargers() {
 
   const handleEdit = (charger) => {
     setEditingId(charger.id);
+
     setForm({
-      name: charger.name,
-      type: charger.type,
-      power: charger.power
+      name: charger.name || "",
+      type: charger.type || "AC",
+      power: charger.power || "",
+      current: charger.current || "",
+      voltage: charger.voltage || "",
+      phase: charger.phase || "",
+      description: charger.description || "",
+      features: Array.isArray(charger.features)
+        ? charger.features.join("\n")
+        : ""
     });
+
     setOpen(true);
   };
 
@@ -101,61 +86,105 @@ export default function ManageChargers() {
     setForm({ ...emptyCharger });
   };
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   const handleSave = (e) => {
     e.preventDefault();
 
     const data = {
       name: form.name.trim(),
       type: form.type,
-      power: form.power.trim()
+      power: form.power.trim(),
+      current: form.current.trim(),
+      voltage: form.voltage.trim(),
+      phase: form.phase.trim(),
+      description: form.description.trim(),
+      features: form.features
+        .split("\n")
+        .map((feature) => feature.trim())
+        .filter(Boolean)
     };
 
-    if (!data.name || !data.type || !data.power) {
+    if (
+      !data.name ||
+      !["AC", "DC"].includes(data.type) ||
+      !data.power ||
+      !data.current ||
+      !data.voltage ||
+      !data.phase ||
+      !data.description ||
+      data.features.length === 0
+    ) {
       toast.error("Please fill all fields!");
       return;
     }
 
     if (editingId !== null) {
-      const updated = chargers.map((charger) =>
-        charger.id === editingId
-          ? { ...charger, ...data }
-          : charger
-      );
-
-      if (saveChargers(updated)) {
-        toast.success("Charger updated successfully!");
-        handleClose();
-      }
+      updateCharger(editingId, data);
+      toast.success("Charger updated successfully!");
     } else {
-      const newCharger = {
-        id: crypto.randomUUID(),
-        ...data
-      };
-
-      if (saveChargers([...chargers, newCharger])) {
-        toast.success("Charger added successfully!");
-        handleClose();
-      }
+      addCharger(data);
+      toast.success("Charger added successfully!");
     }
+
+    handleClose();
   };
 
   const handleDelete = (id) => {
-    if (!window.confirm("Are you sure you want to delete this charger?")) {
-      return;
-    }
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this charger?"
+    );
 
-    const updated = chargers.filter((charger) => charger.id !== id);
+    if (!confirmed) return;
 
-    if (saveChargers(updated)) {
-      toast.success("Charger deleted successfully!");
-    }
+    deleteCharger(id);
+    toast.success("Charger deleted successfully!");
   };
+
+  const fields = [
+    {
+      name: "name",
+      label: "Charger Name",
+      placeholder: "AC Charger 16A Fixed"
+    },
+    {
+      name: "power",
+      label: "Charging Power",
+      placeholder: "3.68 kW"
+    },
+    {
+      name: "current",
+      label: "Charging Current",
+      placeholder: "16A"
+    },
+    {
+      name: "voltage",
+      label: "Voltage",
+      placeholder: "230V"
+    },
+    {
+      name: "phase",
+      label: "Connection",
+      placeholder: "Single Phase"
+    }
+  ];
 
   return (
     <Box
       sx={{
         p: { xs: 2, md: 4 },
-        backgroundColor: "#eff7fd",
+        bgcolor: (theme) =>
+          theme.palette.mode === "dark"
+            ? "background.default"
+            : "#eff7fd",
+        color: "text.primary",
         minHeight: "100vh",
         boxSizing: "border-box"
       }}
@@ -172,20 +201,32 @@ export default function ManageChargers() {
       >
         <Box>
           <Typography
-            sx={{ color: "#10b981", fontWeight: 800, mb: 1 }}
+            sx={{
+              color: "#10b981",
+              fontWeight: 800,
+              mb: 1
+            }}
           >
             ADMIN PANEL
           </Typography>
 
           <Typography
             variant="h4"
-            sx={{ color: "#092b40", fontWeight: 800 }}
+            sx={{
+              color: "text.primary",
+              fontWeight: 800
+            }}
           >
             Manage Chargers
           </Typography>
 
-          <Typography sx={{ color: "#164b91", mt: 1 }}>
-            Manage AC and DC charging equipment.
+          <Typography
+            sx={{
+              color: "text.secondary",
+              mt: 1
+            }}
+          >
+            Add, edit and delete AC and DC chargers.
           </Typography>
         </Box>
 
@@ -195,9 +236,12 @@ export default function ManageChargers() {
           onClick={handleAdd}
           sx={{
             bgcolor: "#10b981",
+            color: "#ffffff",
             textTransform: "none",
             fontWeight: 700,
-            "&:hover": { bgcolor: "#059669" }
+            "&:hover": {
+              bgcolor: "#059669"
+            }
           }}
         >
           Add Charger
@@ -209,42 +253,68 @@ export default function ManageChargers() {
         sx={{
           borderRadius: 3,
           overflow: "hidden",
-          border: "1px solid #e2edf5"
+          bgcolor: "background.paper",
+          border: "1px solid",
+          borderColor: "divider"
         }}
       >
         <TableContainer>
-          <Table sx={{ minWidth: 550 }}>
+          <Table sx={{ minWidth: 750 }}>
             <TableHead>
-              <TableRow sx={{ bgcolor: "#e8fff7" }}>
-                {["#", "Charger Name", "Type", "Power", "Actions"].map(
-                  (heading) => (
-                    <TableCell
-                      key={heading}
-                      sx={{
-                        fontWeight: 800,
-                        color: "#092b40"
-                      }}
-                    >
-                      {heading}
-                    </TableCell>
-                  )
-                )}
+              <TableRow
+                sx={{
+                  bgcolor: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "rgba(16,185,129,0.12)"
+                      : "#e8fff7"
+                }}
+              >
+                {[
+                  "#",
+                  "Charger Name",
+                  "Type",
+                  "Power",
+                  "Current",
+                  "Voltage",
+                  "Actions"
+                ].map((heading) => (
+                  <TableCell
+                    key={heading}
+                    sx={{
+                      fontWeight: 800,
+                      color: "text.primary"
+                    }}
+                  >
+                    {heading}
+                  </TableCell>
+                ))}
               </TableRow>
             </TableHead>
 
             <TableBody>
               {chargers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} align="center" sx={{ py: 5 }}>
+                  <TableCell
+                    colSpan={7}
+                    align="center"
+                    sx={{ py: 5 }}
+                  >
                     No chargers found.
                   </TableCell>
                 </TableRow>
               ) : (
                 chargers.map((charger, index) => (
                   <TableRow key={charger.id} hover>
-                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>
+                      {index + 1}
+                    </TableCell>
 
-                    <TableCell sx={{ fontWeight: 700 }}>
+                    <TableCell
+                      sx={{
+                        fontWeight: 700,
+                        color: "text.primary"
+                      }}
+                    >
                       {charger.name}
                     </TableCell>
 
@@ -266,7 +336,17 @@ export default function ManageChargers() {
                       />
                     </TableCell>
 
-                    <TableCell>{charger.power}</TableCell>
+                    <TableCell>
+                      {charger.power}
+                    </TableCell>
+
+                    <TableCell>
+                      {charger.current || "—"}
+                    </TableCell>
+
+                    <TableCell>
+                      {charger.voltage || "—"}
+                    </TableCell>
 
                     <TableCell>
                       <IconButton
@@ -279,7 +359,9 @@ export default function ManageChargers() {
 
                       <IconButton
                         aria-label={`Delete ${charger.name}`}
-                        onClick={() => handleDelete(charger.id)}
+                        onClick={() =>
+                          handleDelete(charger.id)
+                        }
                         sx={{ color: "#ef4444" }}
                       >
                         <DeleteIcon />
@@ -293,70 +375,132 @@ export default function ManageChargers() {
         </TableContainer>
       </Paper>
 
-      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
-        <Box component="form" onSubmit={handleSave} noValidate>
-          <DialogTitle sx={{ color: "#092b40", fontWeight: 800 }}>
-            {editingId !== null ? "Edit Charger" : "Add Charger"}
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        fullWidth
+        maxWidth="sm"
+        scroll="paper"
+      >
+        <Box
+          component="form"
+          onSubmit={handleSave}
+          noValidate
+        >
+          <DialogTitle
+            sx={{
+              color: "text.primary",
+              fontWeight: 800
+            }}
+          >
+            {editingId !== null
+              ? "Edit Charger"
+              : "Add Charger"}
           </DialogTitle>
 
-          <DialogContent>
+          <DialogContent dividers>
             <TextField
               fullWidth
+              required
               margin="normal"
+              name="name"
               label="Charger Name"
+              placeholder="AC Charger 16A Fixed"
               value={form.name}
-              onChange={(e) =>
-                setForm((prev) => ({
-                  ...prev,
-                  name: e.target.value
-                }))
-              }
+              onChange={handleChange}
             />
 
-            <FormControl fullWidth margin="normal">
+            <FormControl
+              fullWidth
+              required
+              margin="normal"
+            >
               <InputLabel>Charger Type</InputLabel>
+
               <Select
+                name="type"
                 value={form.type}
                 label="Charger Type"
-                onChange={(e) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    type: e.target.value
-                  }))
-                }
+                onChange={handleChange}
               >
-                <MenuItem value="AC">AC Charger</MenuItem>
-                <MenuItem value="DC">DC Charger</MenuItem>
+                <MenuItem value="AC">
+                  AC Charger
+                </MenuItem>
+
+                <MenuItem value="DC">
+                  DC Charger
+                </MenuItem>
               </Select>
             </FormControl>
 
+            {fields
+              .filter((field) => field.name !== "name")
+              .map((field) => (
+                <TextField
+                  key={field.name}
+                  fullWidth
+                  required
+                  margin="normal"
+                  name={field.name}
+                  label={field.label}
+                  placeholder={field.placeholder}
+                  value={form[field.name]}
+                  onChange={handleChange}
+                />
+              ))}
+
             <TextField
               fullWidth
+              required
+              multiline
+              minRows={3}
               margin="normal"
-              label="Charging Power"
-              placeholder="Example: 60 kW"
-              value={form.power}
-              onChange={(e) =>
-                setForm((prev) => ({
-                  ...prev,
-                  power: e.target.value
-                }))
+              name="description"
+              label="Description"
+              placeholder="Write charger description"
+              value={form.description}
+              onChange={handleChange}
+            />
+
+            <TextField
+              fullWidth
+              required
+              multiline
+              minRows={4}
+              margin="normal"
+              name="features"
+              label="Main Features"
+              placeholder={
+                "Fast charging\nHome charging\nEasy operation"
               }
+              helperText="Write each feature on a separate line."
+              value={form.features}
+              onChange={handleChange}
             />
           </DialogContent>
 
           <DialogActions sx={{ p: 2 }}>
-            <Button onClick={handleClose}>Cancel</Button>
+            <Button
+              onClick={handleClose}
+              sx={{ color: "text.secondary" }}
+            >
+              Cancel
+            </Button>
 
             <Button
               type="submit"
               variant="contained"
               sx={{
                 bgcolor: "#10b981",
-                "&:hover": { bgcolor: "#059669" }
+                color: "#ffffff",
+                "&:hover": {
+                  bgcolor: "#059669"
+                }
               }}
             >
-              {editingId !== null ? "Save Changes" : "Add Charger"}
+              {editingId !== null
+                ? "Save Changes"
+                : "Add Charger"}
             </Button>
           </DialogActions>
         </Box>

@@ -1,3 +1,4 @@
+
 import {
   Box,
   IconButton,
@@ -19,6 +20,8 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import ReorderIcon from "@mui/icons-material/Reorder";
 import ElectricCarIcon from "@mui/icons-material/ElectricCar";
 import EvStationIcon from "@mui/icons-material/EvStation";
+import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
+import RateReviewIcon from "@mui/icons-material/RateReview";
 
 const menuItems = [
   {
@@ -45,6 +48,16 @@ const menuItems = [
     title: "Manage Products",
     icon: <ExtensionIcon />,
     path: "/admin/manage-products"
+  },
+  {
+    title: "Manage Orders",
+    icon: <ShoppingBagIcon />,
+    path: "/admin/manage-orders"
+  },
+  {
+    title: "Manage Feedback",
+    icon: <RateReviewIcon />,
+    path: "/admin/manage-feedback"
   }
 ];
 
@@ -64,8 +77,11 @@ export default function Sidebar({ open = true, onclick }) {
       sx={{
         width: open ? 270 : 72,
         flex: open ? "0 0 270px" : "0 0 72px",
-        height: "100%",
-        minHeight: "100vh",
+        position: "sticky",
+        top: 0,
+        height: "100vh",
+        maxHeight: "100vh",
+        alignSelf: "flex-start",
         boxSizing: "border-box",
         overflowY: "auto",
         overflowX: "hidden",
@@ -73,7 +89,9 @@ export default function Sidebar({ open = true, onclick }) {
           "linear-gradient(110deg, #119b78 0%, #16b98b 50%, #20c997 100%)",
         color: "#092b40",
         transition: "width 0.3s ease, flex 0.3s ease",
-        borderRight: "1px solid rgba(9,43,64,0.12)"
+        borderRight: "1px solid rgba(9,43,64,0.12)",
+        scrollbarWidth: "thin",
+        zIndex: 10
       }}
     >
       <Box
@@ -173,7 +191,10 @@ export default function Sidebar({ open = true, onclick }) {
           );
         })}
 
-        <Tooltip title={open ? "" : "Logout"} placement="right">
+        <Tooltip
+          title={open ? "" : "Logout"}
+          placement="right"
+        >
           <ListItemButton
             onClick={handleLogout}
             sx={{
